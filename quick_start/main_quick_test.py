@@ -1,4 +1,5 @@
 import json
+import os
 
 import torch
 from sklearn.metrics import roc_auc_score
@@ -29,7 +30,7 @@ llm_model, llm_tokenizer = setup_hf_llm(
 task_tracker_classifier = load_task_tracker(config["task_tracker_model"])
 
 
-##Load data
+# Load data
 """
 REPLACE with your own data 
 
@@ -40,7 +41,13 @@ Assumption about data:
         - text: external text that can be clean or poisoned
         - label: clean (0) or poisoned (1)
 """
-data = json.load(open(data_path))
+if not os.path.isabs(data_path):
+    data_path = os.path.join(
+        os.path.dirname(__file__), data_path
+    )
+
+with open(data_path, "r") as f:
+    data = json.load(f)
 
 
 # Run task tracker
