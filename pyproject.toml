@@ -1,12 +1,11 @@
 [project]
 name = "tasktracker"
 version = "0.1.0"
-description = "Add your description here"
+description = ""
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "accelerate>=1.10.0",
-    "gitpython>=3.1.45",
     "openai>=1.99.3",
     "pyyaml>=6.0.2",
     "scikit-learn>=1.7.1",
