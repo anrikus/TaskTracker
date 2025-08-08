@@ -125,8 +125,12 @@ def get_last_token_activations(text, model_name, layer, model, tokenizer):
         chat, tokenize=True, add_generation_prompt=True, return_tensors="pt"
     )
 
+    # Use the same device as the model
+    device = next(model.parameters()).device
+    inputs = inputs.to(device)
+
     with torch.no_grad():
-        outputs = model(inputs.cuda(), output_hidden_states=True)
+        outputs = model(inputs, output_hidden_states=True)
 
     last_token_activations = outputs["hidden_states"][layer][:, -1].cpu()
     return last_token_activations
