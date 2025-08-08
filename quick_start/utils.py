@@ -1,3 +1,4 @@
+
 import logging
 import os
 import pickle
@@ -9,9 +10,7 @@ import yaml
 from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer, pipeline
 
 # Task Tracker prompts
-SEP_PROMPT = (
-    "Consider the following request that you must answer based on the given text: "
-)
+SEP_PROMPT = "Consider the following request that you must answer based on the given text: "
 
 GLOBAL_USER_PROMPT = "Summarize the following text"
 
@@ -23,7 +22,6 @@ def setup_hf_llm(model_name, cache_dir, torch_type=torch.bfloat16):
     """
     Sets up a Hugging Face model and tokenizer, caching it for future use.
     """
-
     model_cache_dir = os.path.join(cache_dir, model_name)
     os.makedirs(model_cache_dir, exist_ok=True)
 
@@ -65,6 +63,12 @@ def setup_hf_llm(model_name, cache_dir, torch_type=torch.bfloat16):
 
 
 def load_config(config_path: str = "config.yaml") -> Dict:
+
+    # if (config_path) is not absolute:
+    if not os.path.isabs(config_path):
+        # Use the current file path and the provided config_path
+        config_path = os.path.join(os.path.dirname(__file__), config_path)
+
     try:
         with open(config_path, "r") as f:
             # Load the YAML file contents into a dictionary
@@ -77,7 +81,8 @@ def load_config(config_path: str = "config.yaml") -> Dict:
         logging.error(f"Error parsing YAML configuration: {e}", exc_info=True)
         raise
     except Exception as e:
-        logging.error(f"Unexpected error loading configuration: {e}", exc_info=True)
+        logging.error(
+            f"Unexpected error loading configuration: {e}", exc_info=True)
         raise
 
 
@@ -87,15 +92,16 @@ def load_task_tracker(model_path: str):
             task_tracker_model = pickle.load(f)
         return task_tracker_model
     except FileNotFoundError:
-        logging.error(f"Model file not found at path: {model_path}", exc_info=True)
+        logging.error(
+            f"Model file not found at path: {model_path}", exc_info=True)
         raise
     except pickle.UnpicklingError:
-        logging.error(f"Error unpickling model from file: {model_path}", exc_info=True)
+        logging.error(
+            f"Error unpickling model from file: {model_path}", exc_info=True)
         raise
     except Exception as e:
         logging.error(
-            f"Unexpected error loading task tracker model: {e}", exc_info=True
-        )
+            f"Unexpected error loading task tracker model: {e}", exc_info=True)
         raise
 
 
@@ -138,12 +144,8 @@ def format_prompts(documents, specific_user_prompt=""):
     eliciting_instructions = """ but first before you answer, please complete the following sentence by briefly writing each request(s) you received and you are going to execute next:  
         "All requests that I am going to execute now are:" """
 
-    primary = (
-        "here are your main requests: <MAIN> "
-        + orig_task
-        + " </MAIN>"
-        + eliciting_instructions
-    )
+    primary = "here are your main requests: <MAIN> " + \
+        orig_task + " </MAIN>" + eliciting_instructions
     primary_text = (
         "here are your main requests: <MAIN> "
         + orig_task
@@ -156,22 +158,14 @@ def format_prompts(documents, specific_user_prompt=""):
 
 
 def task_tracker_main(
-    documents,
-    llm,
-    llm_name,
-    tokenizer,
-    task_tracker_model,
-    layer,
-    specific_user_prompt="",
+    documents, llm, llm_name, tokenizer, task_tracker_model, layer, specific_user_prompt=""
 ):
 
     primary, primary_text = format_prompts(documents, specific_user_prompt)
     primary_activations = get_last_token_activations(
-        primary, llm_name, layer, llm, tokenizer
-    )
+        primary, llm_name, layer, llm, tokenizer)
     primary_text_activations = get_last_token_activations(
-        primary_text, llm_name, layer, llm, tokenizer
-    )
+        primary_text, llm_name, layer, llm, tokenizer)
 
     deltas = (primary_text_activations - primary_activations).float().numpy()
 
