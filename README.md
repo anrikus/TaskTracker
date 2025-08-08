@@ -104,13 +104,19 @@ azcopy copy 'https://tasktrackeropensource.blob.core.windows.net/activations/{MO
 
 1. Open VSCode, press `CMD+SHIFT+P` for Mac / `Ctrl+Shift+P` for Windows and type `>Dev Containers: Open Folder in Container`, select the option and open the repo. The first launch will take a while as the container builds. Subsequent launches will be quicker.
 
+1. All `VSCode` terminals should automatically open with the venv activated. In case, it does not (sometimes, VSCode is flaky), activate it using `source .venv/bin/activate`.
+
+1. Run the quick start using `uv run python quick_start/main_quick_test.py` from VSCode terminal. The first run takes longer as model weights need to be downloaded (about 3 - 10 minutes depending on the available bandwidth). Subsequent runs with cached model weights are pretty fast. Sample runs with `Phi-3-mini-4k-instruct` with cached weights take around 80 - 100 seconds on a M4 / 24G Macbook Pro.
+
+1. [uv](https://github.com/astral-sh/uv) is setup as the package manager. To add new dependencies, follow these [instructions](https://docs.astral.sh/uv/concepts/projects/dependencies/#adding-dependencies). **DO NOT** use `conda` or `pip` directly.
+
 ## New data
 
-1- Check `quick_start` for a simple way to run on new data 
+1. Check `quick_start` for a simple way to run on new data 
 
-2- Edit `quick_start/config.yaml` for configurations of classifier path, which LLM, parameters of layers and thresholds, etc. 
+1. Edit `quick_start/config.yaml` for configurations of classifier path, which LLM, parameters of layers and thresholds, etc. 
 
-3- Check the structure of data in `quick_start/mock_data.json`. You can prepare your data as 
+1. Check the structure of data in `quick_start/mock_data.json`. You can prepare your data as 
 
 ```
 [
@@ -122,7 +128,7 @@ azcopy copy 'https://tasktrackeropensource.blob.core.windows.net/activations/{MO
 ]
 ```
 
-4- Run `uv run python quick_start/main_quick_test.py`. According to which LLM/Task Tracker you are using, change `torch_type` when loading the LLM (check `TaskTracker/task_tracker/config/models.py` for the precision we used for each LLM).
+1. Run `uv run python quick_start/main_quick_test.py`. According to which LLM/Task Tracker you are using, change `torch_type` when loading the LLM (check `TaskTracker/task_tracker/config/models.py` for the precision we used for each LLM).
 
 ---
 
