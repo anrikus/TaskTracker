@@ -6,7 +6,6 @@ from typing import Dict
 
 import torch
 import yaml
-from huggingface_hub import snapshot_download
 from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer, pipeline
 
 # Task Tracker prompts
@@ -25,30 +24,39 @@ def setup_hf_llm(model_name, cache_dir, torch_type=torch.bfloat16):
     Sets up a Hugging Face model and tokenizer, caching it for future use.
     """
 
+    model_cache_dir = os.path.join(cache_dir, model_name)
+    os.makedirs(model_cache_dir, exist_ok=True)
+
     try:
-        subprocess.run(
-            [f"git clone git@hf.co:{model_name} {cache_dir}"],
-            check=True,
+        result = subprocess.run(
+            [f"git clone git@hf.co:{model_name} {model_cache_dir}"],
             capture_output=True,
             text=True,
+            check=True,
         )
-    except subprocess.CalledProcessError as e:
-        print(f"Download failed with error with error: {e}")
+        print("Standard Output:")
+        print(result.stdout)
+        print("Standard Error:")
+        print(result.stderr)
+        print("Exit Code:", result.returncode)
 
-    cache_dir = os.path.join(cache_dir, model_name)
+    except subprocess.CalledProcessError as e:
+        print(f"git clone failed with error: {e}")
 
     config = AutoConfig.from_pretrained(
-        model_name, use_cache=True, cache_dir=cache_dir, device_map="auto"
+        model_name,
+        use_cache=True,
+        cache_dir=model_cache_dir,
+        device_map="auto",
     )
 
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         config=config,
-        cache_dir=cache_dir,
+        cache_dir=model_cache_dir,
         device_map="auto",
         torch_dtype=torch_type,
     )
-
     model.eval()
     tokenizer = AutoTokenizer.from_pretrained(model_name, use_cache=True)
     tokenizer.pad_token = tokenizer.eos_token
