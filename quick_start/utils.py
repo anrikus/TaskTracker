@@ -22,12 +22,16 @@ def setup_hf_llm(model_name, cache_dir, torch_type=torch.bfloat16):
     """
     Sets up a Hugging Face model and tokenizer, caching it for future use.
     """
+    if not os.path.isabs(cache_dir):
+        cache_dir = os.path.join(os.path.dirname(
+            os.path.dirname(__file__)), cache_dir)
+
+    os.makedirs(cache_dir, exist_ok=True)
     model_cache_dir = os.path.join(cache_dir, model_name)
-    os.makedirs(model_cache_dir, exist_ok=True)
 
     try:
         result = subprocess.run(
-            [f"git clone git@hf.co:{model_name} {model_cache_dir}"],
+            [f"git clone git@hf.co:{model_name} {cache_dir}"],
             capture_output=True,
             text=True,
             check=True,
