@@ -29,21 +29,23 @@ def setup_hf_llm(model_name, cache_dir, torch_type=torch.bfloat16):
     os.makedirs(cache_dir, exist_ok=True)
     model_cache_dir = os.path.join(cache_dir, model_name)
 
-    try:
-        result = subprocess.run(
-            [f"git clone git@hf.co:{model_name} {cache_dir}"],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-        print("Standard Output:")
-        print(result.stdout)
-        print("Standard Error:")
-        print(result.stderr)
-        print("Exit Code:", result.returncode)
+    # try:
+    #     result = subprocess.run([
+    #         "git", "clone",
+    #         f"https://huggingface.co/{model_name}",
+    #         model_cache_dir],
+    #         capture_output=True,
+    #         text=True,
+    #         check=True,
+    #     )
+    #     print("Standard Output:")
+    #     print(result.stdout)
+    #     print("Standard Error:")
+    #     print(result.stderr)
+    #     print("Exit Code:", result.returncode)
 
-    except subprocess.CalledProcessError as e:
-        print(f"git clone failed with error: {e}")
+    # except subprocess.CalledProcessError as e:
+    #     print(f"git clone failed with error: {e}")
 
     config = AutoConfig.from_pretrained(
         model_name,
@@ -58,6 +60,8 @@ def setup_hf_llm(model_name, cache_dir, torch_type=torch.bfloat16):
         cache_dir=model_cache_dir,
         device_map="auto",
         torch_dtype=torch_type,
+        resume_download=True,
+        low_cpu_mem_usage=True
     )
     model.eval()
     tokenizer = AutoTokenizer.from_pretrained(model_name, use_cache=True)
