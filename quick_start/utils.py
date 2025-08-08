@@ -1,7 +1,7 @@
-
 import logging
 import os
 import pickle
+import subprocess
 from typing import Dict
 
 import torch
@@ -10,7 +10,9 @@ from huggingface_hub import snapshot_download
 from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer, pipeline
 
 # Task Tracker prompts
-SEP_PROMPT = "Consider the following request that you must answer based on the given text: "
+SEP_PROMPT = (
+    "Consider the following request that you must answer based on the given text: "
+)
 
 GLOBAL_USER_PROMPT = "Summarize the following text"
 
@@ -22,24 +24,27 @@ def setup_hf_llm(model_name, cache_dir, torch_type=torch.bfloat16):
     """
     Sets up a Hugging Face model and tokenizer, caching it for future use.
     """
-    config = AutoConfig.from_pretrained(
-        model_name,
-        use_cache=True,
-        cache_dir=os.path.join(cache_dir, model_name),
-        device_map="auto",
-    )
 
-    # Download complete model
-    local_model_path = snapshot_download(
-        repo_id=model_name,
-        cache_dir=cache_dir,
-        resume_download=True,
-        max_workers=1,  # Prevent bandwidth overwhelming
-        ignore_patterns=["*.md", "*.txt"]  # Skip non-essential files
+    try:
+        subprocess.run(
+            [f"git clone git@hf.co:{model_name} {cache_dir}"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except subprocess.CalledProcessError as e:
+        print(f"Download failed with error with error: {e}")
+
+    cache_dir = os.path.join(cache_dir, model_name)
+
+    config = AutoConfig.from_pretrained(
+        model_name, use_cache=True, cache_dir=cache_dir, device_map="auto"
     )
 
     model = AutoModelForCausalLM.from_pretrained(
-        local_model_path,
+        model_name,
+        config=config,
+        cache_dir=cache_dir,
         device_map="auto",
         torch_dtype=torch_type,
     )
@@ -64,8 +69,7 @@ def load_config(config_path: str = "config.yaml") -> Dict:
         logging.error(f"Error parsing YAML configuration: {e}", exc_info=True)
         raise
     except Exception as e:
-        logging.error(
-            f"Unexpected error loading configuration: {e}", exc_info=True)
+        logging.error(f"Unexpected error loading configuration: {e}", exc_info=True)
         raise
 
 
@@ -75,16 +79,15 @@ def load_task_tracker(model_path: str):
             task_tracker_model = pickle.load(f)
         return task_tracker_model
     except FileNotFoundError:
-        logging.error(
-            f"Model file not found at path: {model_path}", exc_info=True)
+        logging.error(f"Model file not found at path: {model_path}", exc_info=True)
         raise
     except pickle.UnpicklingError:
-        logging.error(
-            f"Error unpickling model from file: {model_path}", exc_info=True)
+        logging.error(f"Error unpickling model from file: {model_path}", exc_info=True)
         raise
     except Exception as e:
         logging.error(
-            f"Unexpected error loading task tracker model: {e}", exc_info=True)
+            f"Unexpected error loading task tracker model: {e}", exc_info=True
+        )
         raise
 
 
@@ -127,8 +130,12 @@ def format_prompts(documents, specific_user_prompt=""):
     eliciting_instructions = """ but first before you answer, please complete the following sentence by briefly writing each request(s) you received and you are going to execute next:  
         "All requests that I am going to execute now are:" """
 
-    primary = "here are your main requests: <MAIN> " + \
-        orig_task + " </MAIN>" + eliciting_instructions
+    primary = (
+        "here are your main requests: <MAIN> "
+        + orig_task
+        + " </MAIN>"
+        + eliciting_instructions
+    )
     primary_text = (
         "here are your main requests: <MAIN> "
         + orig_task
@@ -141,14 +148,22 @@ def format_prompts(documents, specific_user_prompt=""):
 
 
 def task_tracker_main(
-    documents, llm, llm_name, tokenizer, task_tracker_model, layer, specific_user_prompt=""
+    documents,
+    llm,
+    llm_name,
+    tokenizer,
+    task_tracker_model,
+    layer,
+    specific_user_prompt="",
 ):
 
     primary, primary_text = format_prompts(documents, specific_user_prompt)
     primary_activations = get_last_token_activations(
-        primary, llm_name, layer, llm, tokenizer)
+        primary, llm_name, layer, llm, tokenizer
+    )
     primary_text_activations = get_last_token_activations(
-        primary_text, llm_name, layer, llm, tokenizer)
+        primary_text, llm_name, layer, llm, tokenizer
+    )
 
     deltas = (primary_text_activations - primary_activations).float().numpy()
 
