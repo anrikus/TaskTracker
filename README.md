@@ -97,19 +97,13 @@ azcopy copy 'https://tasktrackeropensource.blob.core.windows.net/activations/{MO
   ```
   
 ## Environment Setup 
-1. Create and activate the conda environment:
 
-```bash
-conda env create -f environment.yml
-conda activate tasktracker
-```
+1. Install Docker. 
 
-2. Install packages and setup a local instance of the TaskTracker package:
+1. Install [VSCode](https://code.visualstudio.com/download) and the [Devcontainer extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
 
-```bash
-cd TaskTracker
-pip install -e .
-```
+1. Open VSCode, press `CMD+SHIFT+P` for Mac / `Ctrl+Shift+P` for Windows and type `>Dev Containers: Open Folder in Container`, select the option and open the repo. The first launch will take a while as the container builds. Subsequent launches will be quicker.
+
 ## New data
 
 1- Check `quick_start` for a simple way to run on new data 
@@ -128,7 +122,7 @@ pip install -e .
 ]
 ```
 
-4- run `quick_start/main_quick_test.py`. According to which LLM/Task Tracker you are using, change `torch_type` when loading the LLM (check `TaskTracker/task_tracker/config/models.py` for the precision we used for each LLM).
+4- Run `uv run python quick_start/main_quick_test.py`. According to which LLM/Task Tracker you are using, change `torch_type` when loading the LLM (check `TaskTracker/task_tracker/config/models.py` for the precision we used for each LLM).
 
 ---
 
@@ -231,7 +225,7 @@ with_priming: bool = True    # Set to False if no priming prompt is needed
 
 4. Generate activations:
 ```bash
-python task_tracker/activations/generate.py
+uv run python task_tracker/activations/generate.py
 ```
   
 
@@ -281,7 +275,7 @@ MODEL = "llama3_70b"  # Choose from models in task_tracker.training.utils.consta
 2. Run the training script
 
 ```bash
-python task_tracker/training/linear_probe/train_linear_model.py
+uv run python task_tracker/training/linear_probe/train_linear_model.py
 ```
 
 ### Metric Learning Probes
@@ -316,7 +310,7 @@ config = {
 2. Run the training script
 
 ```bash
-python task_tracker/training/triplet_probe/train_per_layer.py
+uv run python task_tracker/training/triplet_probe/train_per_layer.py
 ```
 
 ### Post-Training Steps
@@ -363,7 +357,7 @@ To simulate attacks and verify model responses:
 
 1. Get model responses:
 ```bash
-python task_tracker/evaluation/verifier/get_model_responses.py
+uv run python task_tracker/evaluation/verifier/get_model_responses.py
 ```
 
 2. Configure in the script:
@@ -380,7 +374,7 @@ MODEL = 'mistral'  # Change as needed
 
 2. Run the verifier:
 ```bash 
-python task_tracker/evaluation/verifier/gpt4_judge_parallel_calls.py
+uv run python task_tracker/evaluation/verifier/gpt4_judge_parallel_calls.py
 ```
 3. Configure the script:
 

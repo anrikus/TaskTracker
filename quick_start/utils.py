@@ -24,8 +24,7 @@ def setup_hf_llm(model_name, cache_dir, torch_type=torch.bfloat16):
     Sets up a Hugging Face model and tokenizer, caching it for future use.
     """
     if not os.path.isabs(cache_dir):
-        cache_dir = os.path.join(os.path.dirname(
-            os.path.dirname(__file__)), cache_dir)
+        cache_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), cache_dir)
 
     os.makedirs(cache_dir, exist_ok=True)
 
@@ -73,8 +72,7 @@ def load_config(config_path: str = "config.yaml") -> Dict:
         logging.error(f"Error parsing YAML configuration: {e}", exc_info=True)
         raise
     except Exception as e:
-        logging.error(
-            f"Unexpected error loading configuration: {e}", exc_info=True)
+        logging.error(f"Unexpected error loading configuration: {e}", exc_info=True)
         raise
 
 
@@ -90,12 +88,10 @@ def load_task_tracker(model_path: str):
             task_tracker_model = pickle.load(f)
         return task_tracker_model
     except FileNotFoundError:
-        logging.error(
-            f"Model file not found at path: {model_path}", exc_info=True)
+        logging.error(f"Model file not found at path: {model_path}", exc_info=True)
         raise
     except pickle.UnpicklingError:
-        logging.error(
-            f"Error unpickling model from file: {model_path}", exc_info=True)
+        logging.error(f"Error unpickling model from file: {model_path}", exc_info=True)
         raise
     except Exception as e:
         logging.error(

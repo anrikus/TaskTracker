@@ -42,9 +42,7 @@ Assumption about data:
         - label: clean (0) or poisoned (1)
 """
 if not os.path.isabs(data_path):
-    data_path = os.path.join(
-        os.path.dirname(__file__), data_path
-    )
+    data_path = os.path.join(os.path.dirname(__file__), data_path)
 
 with open(data_path, "r") as f:
     data = json.load(f)
