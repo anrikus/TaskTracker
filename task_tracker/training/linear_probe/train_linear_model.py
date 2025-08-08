@@ -1,11 +1,12 @@
-import os
-import sys
 import json
-import numpy as np
-from tqdm import tqdm
-from pprint import pprint
-from sklearn.linear_model import LogisticRegression
+import os
 import pickle
+import sys
+from pprint import pprint
+
+import numpy as np
+from sklearn.linear_model import LogisticRegression
+from tqdm import tqdm
 
 MODEL = "phi3"
 OUTPUT_DIR = MODEL
@@ -21,7 +22,6 @@ from task_tracker.training.utils.constants import (
     CONSTANTS_ALL_MODELS,
     OOD_POISONED_FILE,
 )
-
 
 # Which layers would be used for training probes
 LAYERS_PER_MODEL = {

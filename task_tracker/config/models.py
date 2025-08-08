@@ -1,7 +1,9 @@
 import os
 from typing import Dict
-from task_tracker.models.model import Model
+
 import torch
+
+from task_tracker.models.model import Model
 
 # Set the cache directory for Hugging Face transformers
 cache_dir = "/disk1/"

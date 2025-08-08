@@ -1,9 +1,10 @@
-import os
-from typing import List
-import torch
-import random
-import numpy as np
 import json
+import os
+import random
+from typing import List
+
+import numpy as np
+import torch
 
 
 def get_file_paths(dir_path: str, prefix: str) -> List[str]:

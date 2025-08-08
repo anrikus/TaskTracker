@@ -1,19 +1,20 @@
+import argparse
+import concurrent.futures
+import json
 import os
 import time
-import json
-from tqdm import tqdm
-import concurrent.futures
-import argparse
+
 from gpt4_judge import Judge
+from tqdm import tqdm
+
+## change the paths of dataset text files
+from task_tracker.config.models import data
 
 ## change the paths of output files
 from task_tracker.experiments_outputs import (
     MODELS_RESPONSE_OUT_FILENAME_PER_MODEL,
     VERIFIER_RESPONSE_OUT_FILENAME_PER_MODEL,
 )
-
-## change the paths of dataset text files
-from task_tracker.config.models import data
 
 POISONED_TEST_DATASET_FILENAME = data["test_poisoned"]
 CLEAN_TEST_DATASET_FILENAME = data["test_clean"]

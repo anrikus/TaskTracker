@@ -1,11 +1,13 @@
+import logging
 import os
+import re
+from datetime import datetime
+
 import torch
 from tqdm import tqdm
-import re
-import logging
-from datetime import datetime
-from task_tracker.utils.data import format_prompts
+
 from task_tracker.models.model import Model
+from task_tracker.utils.data import format_prompts
 
 current_dir = os.getcwd()
 parent_dir = os.path.dirname(current_dir)

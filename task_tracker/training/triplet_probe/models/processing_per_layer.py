@@ -1,7 +1,8 @@
+from typing import Tuple, Union
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from typing import Union, Tuple
 
 
 class BaseLinearProcessingModel(nn.Module):

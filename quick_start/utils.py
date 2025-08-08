@@ -1,4 +1,3 @@
-
 import logging
 import os
 import pickle
@@ -10,7 +9,9 @@ import yaml
 from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer, pipeline
 
 # Task Tracker prompts
-SEP_PROMPT = "Consider the following request that you must answer based on the given text: "
+SEP_PROMPT = (
+    "Consider the following request that you must answer based on the given text: "
+)
 
 GLOBAL_USER_PROMPT = "Summarize the following text"
 
@@ -27,44 +28,27 @@ def setup_hf_llm(model_name, cache_dir, torch_type=torch.bfloat16):
             os.path.dirname(__file__)), cache_dir)
 
     os.makedirs(cache_dir, exist_ok=True)
-    model_cache_dir = os.path.join(cache_dir, model_name)
-
-    # try:
-    #     result = subprocess.run([
-    #         "git", "clone",
-    #         f"https://huggingface.co/{model_name}",
-    #         model_cache_dir],
-    #         capture_output=True,
-    #         text=True,
-    #         check=True,
-    #     )
-    #     print("Standard Output:")
-    #     print(result.stdout)
-    #     print("Standard Error:")
-    #     print(result.stderr)
-    #     print("Exit Code:", result.returncode)
-
-    # except subprocess.CalledProcessError as e:
-    #     print(f"git clone failed with error: {e}")
 
     config = AutoConfig.from_pretrained(
         model_name,
         use_cache=True,
-        cache_dir=model_cache_dir,
+        cache_dir=cache_dir,
         device_map="auto",
     )
 
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         config=config,
-        cache_dir=model_cache_dir,
+        cache_dir=cache_dir,
         device_map="auto",
         torch_dtype=torch_type,
         resume_download=True,
-        low_cpu_mem_usage=True
+        low_cpu_mem_usage=True,
     )
     model.eval()
-    tokenizer = AutoTokenizer.from_pretrained(model_name, use_cache=True)
+    tokenizer = AutoTokenizer.from_pretrained(
+        model_name, use_cache=True, low_cpu_mem_usage=True
+    )
     tokenizer.pad_token = tokenizer.eos_token
 
     return model, tokenizer
@@ -95,6 +79,12 @@ def load_config(config_path: str = "config.yaml") -> Dict:
 
 
 def load_task_tracker(model_path: str):
+
+    if not os.path.isabs(model_path):
+        model_path = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)), model_path
+        )
+
     try:
         with open(model_path, "rb") as f:
             task_tracker_model = pickle.load(f)
@@ -109,7 +99,8 @@ def load_task_tracker(model_path: str):
         raise
     except Exception as e:
         logging.error(
-            f"Unexpected error loading task tracker model: {e}", exc_info=True)
+            f"Unexpected error loading task tracker model: {e}", exc_info=True
+        )
         raise
 
 
@@ -152,8 +143,12 @@ def format_prompts(documents, specific_user_prompt=""):
     eliciting_instructions = """ but first before you answer, please complete the following sentence by briefly writing each request(s) you received and you are going to execute next:  
         "All requests that I am going to execute now are:" """
 
-    primary = "here are your main requests: <MAIN> " + \
-        orig_task + " </MAIN>" + eliciting_instructions
+    primary = (
+        "here are your main requests: <MAIN> "
+        + orig_task
+        + " </MAIN>"
+        + eliciting_instructions
+    )
     primary_text = (
         "here are your main requests: <MAIN> "
         + orig_task
@@ -166,14 +161,22 @@ def format_prompts(documents, specific_user_prompt=""):
 
 
 def task_tracker_main(
-    documents, llm, llm_name, tokenizer, task_tracker_model, layer, specific_user_prompt=""
+    documents,
+    llm,
+    llm_name,
+    tokenizer,
+    task_tracker_model,
+    layer,
+    specific_user_prompt="",
 ):
 
     primary, primary_text = format_prompts(documents, specific_user_prompt)
     primary_activations = get_last_token_activations(
-        primary, llm_name, layer, llm, tokenizer)
+        primary, llm_name, layer, llm, tokenizer
+    )
     primary_text_activations = get_last_token_activations(
-        primary_text, llm_name, layer, llm, tokenizer)
+        primary_text, llm_name, layer, llm, tokenizer
+    )
 
     deltas = (primary_text_activations - primary_activations).float().numpy()
 

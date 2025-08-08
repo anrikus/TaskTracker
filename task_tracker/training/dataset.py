@@ -1,10 +1,11 @@
-import torch
-import os
 import json
-from tqdm import tqdm
-from torch.utils.data import Dataset
+import os
 import random
-from typing import List, Union, Tuple
+from typing import List, Tuple, Union
+
+import torch
+from torch.utils.data import Dataset
+from tqdm import tqdm
 
 HIDDEN_STATES_DIR = "/share/data_instruct_sep/get_activations/mistral"
 

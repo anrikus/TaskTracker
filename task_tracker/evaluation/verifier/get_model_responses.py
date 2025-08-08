@@ -1,17 +1,16 @@
-import torch
-import numpy as np
 import json
 import os
 import sys
-from transformers import AutoModelForCausalLM, AutoTokenizer, AutoConfig
-from transformers import AutoTokenizer, pipeline
+
+import numpy as np
+import torch
+from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer, pipeline
+
+# change to path of text files and cache dirs
+from task_tracker.config.models import cache_dir, data, models
 
 # change to path of output files (to be generated)
 from task_tracker.experiments_outputs import MODELS_RESPONSE_OUT_FILENAME_PER_MODEL
-
-# change to path of text files and cache dirs
-from task_tracker.config.models import data, models, cache_dir
-
 
 POISONED_TEST_DATASET_FILENAME = data["test_poisoned"]
 CLEAN_TEST_DATASET_FILENAME = data["test_clean"]
