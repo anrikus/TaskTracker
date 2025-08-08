@@ -35,7 +35,6 @@
 				"ms-python.isort",
 				"ms-python.mypy-type-checker",
 				"ms-toolsai.jupyter",
-				"tsandall.opa",
 				"bierner.markdown-mermaid"
 			],
 			// Set *default* container specific settings.json values on container create.
