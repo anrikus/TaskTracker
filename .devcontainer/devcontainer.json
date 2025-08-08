@@ -1,0 +1,69 @@
+{
+	"build": {
+		"dockerfile": "./Dockerfile",
+		"context": "."
+	},
+	"features": {
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"username": "vscode",
+			"userUid": "1000",
+			"userGid": "1000",
+			"upgradePackages": "true"
+		},
+		"ghcr.io/devcontainers/features/azure-cli:1": {},
+		"ghcr.io/devcontainers/features/git:1": {},
+		"ghcr.io/devcontainers/features/git-lfs:1": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {},
+		"ghcr.io/devcontainers-extra/features/black:2": {},
+		"ghcr.io/devcontainers-extra/features/isort:2": {},
+		"ghcr.io/devcontainers-extra/features/pylint:2": {}
+	},
+	// Add environment variables
+	"containerEnv": {
+		"PYTHON_VERSION": "3.12"
+	},
+	// Configure tool-specific properties.
+	"customizations": {
+		// Configure properties specific to VS Code.
+		"vscode": {
+			"extensions": [
+				"ms-python.python",
+				"ms-azuretools.vscode-docker",
+				"ms-python.vscode-pylance",
+				"ms-python.debugpy",
+				"ms-python.pylint",
+				"ms-python.isort",
+				"ms-python.mypy-type-checker",
+				"ms-toolsai.jupyter",
+				"tsandall.opa",
+				"bierner.markdown-mermaid"
+			],
+			// Set *default* container specific settings.json values on container create.
+			"settings": {
+				"editor.codeActionsOnSave": {
+					"source.organizeImports": true
+				},
+				"editor.formatOnSave": true,
+				"python.defaultInterpreterPath": "/workspaces/TaskTracker/.venv/bin/python",
+				"python.formatting.provider": "black",
+				"python.linting.enabled": true,
+				"python.linting.pylintArgs": [
+					"--disable=C0111"
+				],
+				"python.linting.pylintEnabled": true,
+				"python.sortImports.args": [
+					"--profile",
+					"black"
+				],
+				"python.terminal.activateEnvInCurrentTerminal": true,
+				"python.terminal.activateEnvironment": true,
+				"python.typeChecking": "basic"
+			}
+		}
+	},
+	// Download and install Azure Artifacts Credential Provider and uv
+	// Set up Python virtual environment using uv
+	"postCreateCommand": "pipx install --index-url https://pypi.org/simple/ uv && uv python install ${containerEnv:PYTHON_VERSION} && uv venv /workspaces/TaskTracker/.venv --clear --python ${PYTHON_VERSION} && cd /workspaces/TaskTracker && uv sync && uv pip install -e .",
+	// Set `remoteUser` to `root` to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
+	"remoteUser": "vscode"
+}

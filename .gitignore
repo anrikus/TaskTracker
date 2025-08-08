@@ -2,3 +2,8 @@ _activations_old/*
 *.ipynb
 *.pyc
 *.egg-info
+.specstory/*
+.venv/*
+.vscode/*
+__pycache__/*
+disk1/*
