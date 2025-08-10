@@ -106,17 +106,17 @@ azcopy copy 'https://tasktrackeropensource.blob.core.windows.net/activations/{MO
 
 1. All `VSCode` terminals should automatically open with the venv activated. In case, it does not (sometimes, VSCode is flaky), activate it using `source .venv/bin/activate`.
 
-1. Run the quick start using `uv run python quick_start/main_quick_test.py` from VSCode terminal. The first run takes longer as model weights need to be downloaded (about 3 - 10 minutes depending on the available bandwidth). Subsequent runs with cached model weights are pretty fast. Sample runs with `Phi-3-mini-4k-instruct` with cached weights take around 80 - 100 seconds on a M4 / 24G Macbook Pro.
+1. Run the quick start using `uv run python example/main_quick_test.py` from VSCode terminal. The first run takes longer as model weights need to be downloaded (about 3 - 10 minutes depending on the available bandwidth). Subsequent runs with cached model weights are pretty fast. Sample runs with `Phi-3-mini-4k-instruct` with cached weights take around 80 - 100 seconds on a M4 / 24G Macbook Pro.
 
 1. [uv](https://github.com/astral-sh/uv) is setup as the package manager. To add new dependencies, follow these [instructions](https://docs.astral.sh/uv/concepts/projects/dependencies/#adding-dependencies). **DO NOT** use `conda` or `pip` directly.
 
 ## New data
 
-1. Check `quick_start` for a simple way to run on new data 
+1. Check `examples` for a simple way to run on new data 
 
-1. Edit `quick_start/config.yaml` for configurations of classifier path, which LLM, parameters of layers and thresholds, etc. 
+1. Edit `examples/config.yaml` for configurations of classifier path, which LLM, parameters of layers and thresholds, etc. 
 
-1. Check the structure of data in `quick_start/mock_data.json`. You can prepare your data as 
+1. Check the structure of data in `examples/mock_data.json`. You can prepare your data as 
 
 ```
 [
@@ -128,7 +128,7 @@ azcopy copy 'https://tasktrackeropensource.blob.core.windows.net/activations/{MO
 ]
 ```
 
-1. Run `uv run python quick_start/main_quick_test.py`. According to which LLM/Task Tracker you are using, change `torch_type` when loading the LLM (check `TaskTracker/task_tracker/config/models.py` for the precision we used for each LLM).
+1. Run `uv run python examples/main_quick_test.py`. According to which LLM/Task Tracker you are using, change `torch_type` when loading the LLM (check `src/tasktracker/config/models.py` for the precision we used for each LLM).
 
 ---
 
@@ -139,15 +139,15 @@ We provide pre-sampled dataset examples for training and evaluation (see option 
 ### Option 1: Using Pre-sampled Dataset
 
 1. We provide scripts to regenerate our dataset exactly (which you can verify with prompt hashes values).
-2. Please run the notebooks in `task_tracker/dataset_creation/recreate_dataset` which will automatically download the relevant resources and build the dataset. No change is required. 
-3. Update the dataset file paths in `task_tracker/config/models.py` to point to your created files.
+2. Please run the notebooks in `src/tasktracker/dataset_creation/recreate_dataset` which will automatically download the relevant resources and build the dataset. No change is required. 
+3. Update the dataset file paths in `src/tasktracker/config/models.py` to point to your created files.
 
 ### Option 2: Constructing Your Own Dataset
 
 To create your own dataset:
 
-1. Run the Jupyter notebooks in `task_tracker/dataset_creation/` to prepare training, validation, and test datasets.
-2. Update dataset file paths in `task_tracker/config/models.py` to point to your newly generated files.
+1. Run the Jupyter notebooks in `src/tasktracker/dataset_creation/` to prepare training, validation, and test datasets.
+2. Update dataset file paths in `src/tasktracker/config/models.py` to point to your newly generated files.
 
 #### Dependencies
 
@@ -189,7 +189,7 @@ Note: Each notebook contains detailed instructions and customization options. Ad
 #### Post-Generation Steps
 
 After generating or downloading the dataset:
-- Update the dataset file paths in `task_tracker/config/models.py`
+- Update the dataset file paths in `src/tasktracker/config/models.py`
 
 ----
 
@@ -201,13 +201,13 @@ After generating or downloading the dataset:
 ### Option 1: Using Pre-computed Activations
 
 1. After receiving access, download the activation files.
-2. Update the `DATA_LISTS` path in `task_tracker/training/utils/constants.py` to point to your downloaded files.
+2. Update the `DATA_LISTS` path in `src/tasktracker/training/utils/constants.py` to point to your downloaded files.
 
 ### Option 2: Generating Your Own Activations
 
 To generate activations:
 
-1. Configure paths in `task_tracker/config/models.py`:
+1. Configure paths in `src/tasktracker/config/models.py`:
 ```python
 # HuggingFace cache directory
 cache_dir = "/path/to/hf/cache/"
@@ -221,17 +221,17 @@ activation_parent_dir = "/path/to/store/activations/"
 text_dataset_parent_dir = "/path/to/dataset/text/files/"
 ```
 
-2. Customize activation generation in `task_tracker/activations/generate.py`:
+2. Customize activation generation in `src/tasktracker/activations/generate.py`:
 ```python
-model_name: str = "mistral"  # Choose from models in task_tracker.config.models
+model_name: str = "mistral"  # Choose from models in src/tasktracker.config.models
 with_priming: bool = True    # Set to False if no priming prompt is needed
 ```
 
-3. (Optional) Modify the priming prompt in `task_tracker/utils/data.py` if needed.
+3. (Optional) Modify the priming prompt in `src/tasktracker/utils/data.py` if needed.
 
 4. Generate activations:
 ```bash
-uv run python task_tracker/activations/generate.py
+uv run python src/tasktracker/activations/generate.py
 ```
   
 
@@ -240,15 +240,15 @@ After generating or downloading activations:
 
 1. Organize activation files:
 * Create lists of .pt files for training, validation (clean and test), and test (clean and poisoned) splits.
-* See examples in task_tracker/data/.
+* See examples in tasktracker/data/.
 
 
-2. Update the `DATA_LISTS` path in `task_tracker/training/utils/constants.py`:
+2. Update the `DATA_LISTS` path in `src/tasktracker/training/utils/constants.py`:
 ```python
 DATA_LISTS = "/path/to/activation/file/lists/"
 ```
 
-Note: Ensure that dataset file paths in task_tracker/config/models.py are correct before generating activations.
+Note: Ensure that dataset file paths in src/tasktracker/config/models.py are correct before generating activations.
 
 
 ----
@@ -259,36 +259,36 @@ We provide pre-trained probes in the repository. However, if you wish to train y
 ### Prerequisites
 
 Ensure you have:
-1. Dataset text files specified in `task_tracker/config/models.py` (from the dataset creation step)
-2. Activation file lists (`DATA_LISTS`) in `task_tracker/training/utils/constants.py` (from the activation generation step)
+1. Dataset text files specified in `src/tasktracker/config/models.py` (from the dataset creation step)
+2. Activation file lists (`DATA_LISTS`) in `src/tasktracker/training/utils/constants.py` (from the activation generation step)
 
 ### Configuration
 
-1. Set the output directory for triplet probes in `task_tracker/training/utils/constants.py`:
+1. Set the output directory for triplet probes in `src/tasktracker/training/utils/constants.py`:
    ```python
    MODEL_OUTPUT_DIR = '/path/to/output/directory'
 
 
 ### Linear Probes
 
-1. Edit `task_tracker/training/linear_probe/train_linear_model.py`:
+1. Edit `src/tasktracker/training/linear_probe/train_linear_model.py`:
 
 
 ```python
-MODEL = "llama3_70b"  # Choose from models in task_tracker.training.utils.constants
+MODEL = "llama3_70b"  # Choose from models in src/tasktracker.training.utils.constants
 ```
 
 2. Run the training script
 
 ```bash
-uv run python task_tracker/training/linear_probe/train_linear_model.py
+uv run python src/tasktracker/training/linear_probe/train_linear_model.py
 ```
 
 ### Metric Learning Probes
-1. Edit `task_tracker/training/triplet_probe/train_per_layer.py`:
+1. Edit `src/tasktracker/training/triplet_probe/train_per_layer.py`:
 
 ```python
-MODEL = 'mistral'  # Choose from models in task_tracker.training.utils.constants
+MODEL = 'mistral'  # Choose from models in src/tasktracker.training.utils.constants
 
 config = {
     'model': MODEL,
@@ -316,12 +316,12 @@ config = {
 2. Run the training script
 
 ```bash
-uv run python task_tracker/training/triplet_probe/train_per_layer.py
+uv run python src/tasktracker/training/triplet_probe/train_per_layer.py
 ```
 
 ### Post-Training Steps
 After training or downloading pre-trained models:
-1. Update the paths to trained model directories in `task_tracker/experiments_outputs.py`:
+1. Update the paths to trained model directories in `src/tasktracker/experiments_outputs.py`:
 
 ```python
 linear_probe_out_parent_dir = "/path/to/linear/probes"
@@ -337,17 +337,17 @@ This section provides scripts to evaluate models and reproduce our experiments.
 ### Prerequisites
 
 Ensure you have:
-1. Dataset text files specified in `task_tracker/config/models.py`
-2. Activation file lists (`DATA_LISTS`) in `task_tracker/training/utils/constants.py`
-3. Paths to trained models in `task_tracker/experiments_outputs.py`
+1. Dataset text files specified in `src/tasktracker/config/models.py`
+2. Activation file lists (`DATA_LISTS`) in `src/tasktracker/training/utils/constants.py`
+3. Paths to trained models in `src/tasktracker/experiments_outputs.py`
 
 ### Visualizing Activations
 
-Use `task_tracker/evaluation/visualizations/tsne_raw_activations.ipynb` to visualize task activation residuals:
+Use `src/tasktracker/evaluation/visualizations/tsne_raw_activations.ipynb` to visualize task activation residuals:
 
 ```python
-from task_tracker.training.dataset import ActivationsDatasetDynamicPrimaryText
-from task_tracker.training.utils.constants import (
+from tasktracker.training.dataset import ActivationsDatasetDynamicPrimaryText
+from tasktracker.training.utils.constants import (
     TEST_ACTIVATIONS_DIR_PER_MODEL, TEST_CLEAN_FILES_PER_MODEL,
     TEST_POISONED_FILES_PER_MODEL)
 
@@ -363,13 +363,13 @@ To simulate attacks and verify model responses:
 
 1. Get model responses:
 ```bash
-uv run python task_tracker/evaluation/verifier/get_model_responses.py
+uv run python src/tasktracker/evaluation/verifier/get_model_responses.py
 ```
 
 2. Configure in the script:
 ```python
-from task_tracker.config.models import cache_dir, data, models
-from task_tracker.experiments_outputs import \
+from tasktracker.config.models import cache_dir, data, models
+from tasktracker.experiments_outputs import \
     MODELS_RESPONSE_OUT_FILENAME_PER_MODEL
 
 POISONED_TEST_DATASET_FILENAME = data['test_poisoned'] 
@@ -380,15 +380,15 @@ MODEL = 'mistral'  # Change as needed
 
 2. Run the verifier:
 ```bash 
-uv run python task_tracker/evaluation/verifier/gpt4_judge_parallel_calls.py
+uv run python src/tasktracker/evaluation/verifier/gpt4_judge_parallel_calls.py
 ```
 3. Configure the script:
 
 Note: This script uses parallel API calls. Be mindful of costs when processing large datasets.
 
 ```python
-from task_tracker.config.models import data
-from task_tracker.experiments_outputs import (
+from tasktracker.config.models import data
+from tasktracker.experiments_outputs import (
     MODELS_RESPONSE_OUT_FILENAME_PER_MODEL,
     VERIFIER_RESPONSE_OUT_FILENAME_PER_MODEL)
 
@@ -402,11 +402,11 @@ AZURE_OPENAI_ENDPOINT = ''
 
 
 #### Evaluating Linear Probes
-Use `task_tracker/evaluation/linear_probe/evaluate_linear_models.ipynb`:
+Use `src/tasktracker/evaluation/linear_probe/evaluate_linear_models.ipynb`:
 ```python
-from task_tracker.experiments_outputs import LINEAR_PROBES_PATHS_PER_MODEL
-from task_tracker.training.dataset import ActivationsDatasetDynamicPrimaryText
-from task_tracker.training.utils.constants import (
+from tasktracker.experiments_outputs import LINEAR_PROBES_PATHS_PER_MODEL
+from tasktracker.training.dataset import ActivationsDatasetDynamicPrimaryText
+from tasktracker.training.utils.constants import (
     TEST_ACTIVATIONS_DIR_PER_MODEL, TEST_CLEAN_FILES_PER_MODEL,
     TEST_POISONED_FILES_PER_MODEL)
 
@@ -419,18 +419,18 @@ MODEL = 'llama3_70b'
 #### Evaluating Triplet Probes
 1. Generate embeddings:
 
-Use `task_tracker/evaluation/triplet_probe/evaluate_triplet_models_test_data.ipynb`:
+Use `src/tasktracker/evaluation/triplet_probe/evaluate_triplet_models_test_data.ipynb`:
 
 ```python
-from task_tracker.experiments_outputs import TRIPLET_PROBES_PATHS_PER_MODEL
-from task_tracker.training.utils.constants import (
+from tasktracker.experiments_outputs import TRIPLET_PROBES_PATHS_PER_MODEL
+from tasktracker.training.utils.constants import (
     TEST_ACTIVATIONS_DIR_PER_MODEL, TEST_CLEAN_FILES_PER_MODEL,
     TEST_POISONED_FILES_PER_MODEL)
 
 MODEL = 'llama3_70b'
 ```
 
-2. Update embedding paths in `task_tracker/experiments_outputs.py`:
+2. Update embedding paths in `src/tasktracker/experiments_outputs.py`:
 
 ```python
 
@@ -445,11 +445,11 @@ TRIPLET_PROBES_PATHS_PER_MODEL = {
 ```
 3. Analyze distances:
 
-Use `task_tracker/evaluation/triplet_probe/distances_per_conditions.ipynb`:
+Use `src/tasktracker/evaluation/triplet_probe/distances_per_conditions.ipynb`:
 
 ```python
-from task_tracker.config.models import data
-from task_tracker.experiments_outputs import (
+from tasktracker.config.models import data
+from tasktracker.experiments_outputs import (
     TRIPLET_PROBES_PATHS_PER_MODEL, VERIFIER_RESPONSE_OUT_FILENAME_PER_MODEL)
 
 POISONED_TEST_DATASET_FILENAME = data['test_poisoned'] 
@@ -458,11 +458,11 @@ CLEAN_TEST_DATASET_FILENAME = data['test_clean']
 
 4. Analyze temporal distances:
 
-Use `task_tracker/evaluation/triplet_probe/temporal_distances_per_tokens.ipynb`:
+Use `src/tasktracker/evaluation/triplet_probe/temporal_distances_per_tokens.ipynb`:
 
 ```python
-from task_tracker.config.models import cache_dir, data, models
-from task_tracker.experiments_outputs import TRIPLET_PROBES_PATHS_PER_MODEL
+from tasktracker.config.models import cache_dir, data, models
+from tasktracker.experiments_outputs import TRIPLET_PROBES_PATHS_PER_MODEL
 
 os.environ["TRANSFORMERS_CACHE"] = cache_dir
 os.environ["HF_HOME"] = cache_dir

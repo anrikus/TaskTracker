@@ -5,9 +5,9 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List
 
-import azure.functions as func
-
 from task_tracker import activation_generation, linear_probe, triplet_probe
+
+import azure.functions as func
 
 TASKTRACKER_AVAILABLE = True
 
@@ -15,7 +15,7 @@ TASKTRACKER_AVAILABLE = True
 app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
 
 
-@app.route(route="v1/health", methods=["GET"])
+@app.route(route="health", methods=["GET"])
 def health_check(req: func.HttpRequest) -> func.HttpResponse:
     """Health check endpoint"""
     logging.info('Health check endpoint was triggered.')
@@ -98,39 +98,40 @@ def list_probes(req: func.HttpRequest) -> func.HttpResponse:
 
     try:
         probes = []
-        
+
         # Path to the trained linear probes directory
-        probes_dir = Path(__file__).parent.parent / "models" / "trained_linear_probes"
-        
+        probes_dir = Path(__file__).parent.parent / \
+            "models" / "trained_linear_probes"
+
         if probes_dir.exists():
             # Iterate through each model directory
             for model_dir in probes_dir.iterdir():
                 if model_dir.is_dir():
                     model_name = model_dir.name
                     layers = []
-                    
+
                     # Iterate through each layer directory within the model
                     for layer_dir in model_dir.iterdir():
                         if layer_dir.is_dir() and layer_dir.name.isdigit():
                             layer_num = int(layer_dir.name)
-                            
+
                             # Check if this layer has the required files
                             config_file = layer_dir / "config.json"
                             model_file = layer_dir / "model.pickle"
-                            
+
                             if config_file.exists() and model_file.exists():
                                 layers.append(layer_num)
-                    
+
                     # Sort layers by layer number
                     layers.sort()  # Simple numeric sort since layers are now just integers
-                    
+
                     if layers:  # Only include models that have available layers
                         probes.append({
                             "model": model_name,
                             "type": "linear_probe",
                             "layers": layers
                         })
-        
+
         return func.HttpResponse(
             json.dumps({"probes": probes}),
             status_code=200,
