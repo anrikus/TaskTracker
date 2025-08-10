@@ -1,22 +1,7 @@
 {
 	"build": {
-		"dockerfile": "./Dockerfile",
-		"context": "."
-	},
-	"features": {
-		"ghcr.io/devcontainers/features/common-utils:2": {
-			"username": "vscode",
-			"userUid": "1000",
-			"userGid": "1000",
-			"upgradePackages": "true"
-		},
-		"ghcr.io/devcontainers/features/azure-cli:1": {},
-		"ghcr.io/devcontainers/features/git:1": {},
-		"ghcr.io/devcontainers/features/git-lfs:1": {},
-		"ghcr.io/devcontainers/features/github-cli:1": {},
-		"ghcr.io/devcontainers-extra/features/black:2": {},
-		"ghcr.io/devcontainers-extra/features/isort:2": {},
-		"ghcr.io/devcontainers-extra/features/pylint:2": {}
+		"context": ".",
+		"dockerfile": "./Dockerfile"
 	},
 	// Add environment variables
 	"containerEnv": {
@@ -35,24 +20,24 @@
 				"ms-python.isort",
 				"ms-python.mypy-type-checker",
 				"ms-toolsai.jupyter",
-				"bierner.markdown-mermaid"
+				"bierner.markdown-mermaid",
+				"ms-azuretools.vscode-azurefunctions",
+				"Azurite.azurite"
 			],
 			// Set *default* container specific settings.json values on container create.
 			"settings": {
 				"editor.codeActionsOnSave": {
-					"source.organizeImports": true
+					"source.fixAll": true,
+					"source.organizeImports": true,
+					"source.sort.json": true,
+					"source.unusedImports": true
 				},
 				"editor.formatOnSave": true,
-				"python.defaultInterpreterPath": "/workspaces/TaskTracker/.venv/bin/python",
+				"python.defaultInterpreterPath": "${containerWorkspaceFolder}/.venv/bin/python",
 				"python.formatting.provider": "black",
 				"python.linting.enabled": true,
 				"python.linting.pylintArgs": [
 					"--disable=C0111"
-				],
-				"python.linting.pylintEnabled": true,
-				"python.sortImports.args": [
-					"--profile",
-					"black"
 				],
 				"python.terminal.activateEnvInCurrentTerminal": true,
 				"python.terminal.activateEnvironment": true,
@@ -60,9 +45,28 @@
 			}
 		}
 	},
-	// Download and install Azure Artifacts Credential Provider and uv
+	"features": {
+		"ghcr.io/devcontainers-extra/features/black:2": {},
+		"ghcr.io/devcontainers-extra/features/isort:2": {},
+		"ghcr.io/devcontainers-extra/features/mypy:2": {},
+		"ghcr.io/devcontainers-extra/features/pylint:2": {},
+		"ghcr.io/devcontainers/features/azure-cli:1": {},
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"upgradePackages": "true",
+			"userGid": "1000",
+			"username": "vscode",
+			"userUid": "1000"
+		},
+		"ghcr.io/devcontainers/features/git-lfs:1": {},
+		"ghcr.io/devcontainers/features/git:1": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {},
+		"ghcr.io/devcontainers/features/node:1": {}
+	},
+	// Download and install 
+	// azure-functions-core-tools, azure artifacts credential provider, uv 
 	// Set up Python virtual environment using uv
-	"postCreateCommand": "pipx install --index-url https://pypi.org/simple/ uv && uv python install ${containerEnv:PYTHON_VERSION} && uv venv /workspaces/TaskTracker/.venv --clear --python ${PYTHON_VERSION} && cd /workspaces/TaskTracker && uv sync && uv pip install -e .",
+	// Install tasktracker in editable mode
+	"postCreateCommand": "npm install -g npm@latest && npm i -g azure-functions-core-tools@4 && pipx install uv && uv python install ${containerEnv:PYTHON_VERSION} && uv venv ${containerWorkspaceFolder}/.venv --clear --python ${PYTHON_VERSION} && cd ${containerWorkspaceFolder} && uv sync && uv pip install -e .",
 	// Set `remoteUser` to `root` to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "vscode"
 }
