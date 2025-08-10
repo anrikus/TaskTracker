@@ -7,3 +7,4 @@ _activations_old/*
 .vscode/*
 __pycache__/*
 disk1/*
+dist/*
