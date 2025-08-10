@@ -4,20 +4,10 @@ from typing import Any, Dict
 
 import azure.functions as func
 
-# Import your task tracker modules
-try:
-    # TODO: Import actual TaskTracker modules when available
-    # from task_tracker.config.models import Config
-    # from task_tracker.utils import load_config
-    pass
-except ImportError:
-    # Fallback for development/testing
-    logging.warning("TaskTracker modules not found. Running in mock mode.")
-
 app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
 
 
-@app.route(route="health", methods=["GET"])
+@app.route(route="v1/health", methods=["GET"])
 def health_check(req: func.HttpRequest) -> func.HttpResponse:
     """Health check endpoint"""
     logging.info('Health check endpoint was triggered.')
@@ -32,7 +22,7 @@ def health_check(req: func.HttpRequest) -> func.HttpResponse:
     )
 
 
-@app.route(route="predict", methods=["POST"])
+@app.route(route="v1/predict", methods=["POST"])
 def predict(req: func.HttpRequest) -> func.HttpResponse:
     """Main prediction endpoint"""
     logging.info('Predict endpoint was triggered.')
@@ -75,7 +65,7 @@ def predict(req: func.HttpRequest) -> func.HttpResponse:
         )
 
     except Exception as e:
-        logging.error(f"Error in predict endpoint: {str(e)}")
+        logging.error("Error in predict endpoint: %s", str(e))
         return func.HttpResponse(
             json.dumps({"error": f"Internal server error: {str(e)}"}),
             status_code=500,
@@ -83,7 +73,7 @@ def predict(req: func.HttpRequest) -> func.HttpResponse:
         )
 
 
-@app.route(route="models", methods=["GET"])
+@app.route(route="v1/models", methods=["GET"])
 def list_models(req: func.HttpRequest) -> func.HttpResponse:
     """List available models endpoint"""
     logging.info('List models endpoint was triggered.')
@@ -107,58 +97,6 @@ def list_models(req: func.HttpRequest) -> func.HttpResponse:
 
     except Exception as e:
         logging.error(f"Error in list_models endpoint: {str(e)}")
-        return func.HttpResponse(
-            json.dumps({"error": f"Internal server error: {str(e)}"}),
-            status_code=500,
-            mimetype="application/json"
-        )
-
-
-@app.route(route="config", methods=["GET", "POST"])
-def manage_config(req: func.HttpRequest) -> func.HttpResponse:
-    """Configuration management endpoint"""
-    logging.info('Config endpoint was triggered.')
-
-    try:
-        if req.method == "GET":
-            # Return current configuration
-            # TODO: Replace with actual config loading
-            config = {
-                "models_enabled": ["llama3_70b", "mistral", "phi3"],
-                "default_model": "mistral",
-                "api_version": "v1.0",
-                "features": {
-                    "linear_probe": True,
-                    "triplet_probe": True,
-                    "activation_generation": True
-                }
-            }
-
-            return func.HttpResponse(
-                json.dumps(config),
-                status_code=200,
-                mimetype="application/json"
-            )
-
-        elif req.method == "POST":
-            # Update configuration
-            req_body = req.get_json()
-            if not req_body:
-                return func.HttpResponse(
-                    json.dumps({"error": "Configuration data is required"}),
-                    status_code=400,
-                    mimetype="application/json"
-                )
-
-            # TODO: Implement configuration update logic
-            return func.HttpResponse(
-                json.dumps({"message": "Configuration updated successfully"}),
-                status_code=200,
-                mimetype="application/json"
-            )
-
-    except Exception as e:
-        logging.error("Error in config endpoint: %s", str(e))
         return func.HttpResponse(
             json.dumps({"error": f"Internal server error: {str(e)}"}),
             status_code=500,
