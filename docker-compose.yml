@@ -1,0 +1,22 @@
+# Docker deployment script for TaskTracker Azure Function
+version: '3.8'
+
+services:
+  tasktracker-function:
+    build: .
+    ports:
+      - "7071:80"
+    environment:
+      - AzureWebJobsStorage=UseDevelopmentStorage=true
+      - FUNCTIONS_WORKER_RUNTIME=python
+      - TASKTRACKER_LOG_LEVEL=DEBUG
+      - TASKTRACKER_MODEL_PATH=/app/trained_linear_probes
+      - TASKTRACKER_CONFIG_PATH=/app/config
+    volumes:
+      - ./trained_linear_probes:/app/trained_linear_probes:ro
+      - ./task_tracker/config:/app/config:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
