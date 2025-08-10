@@ -2,14 +2,46 @@
 import json
 import logging
 import os
+import pickle
 from pathlib import Path
-from typing import Any, Dict, List
-
-from task_tracker import activation_generation, linear_probe, triplet_probe
+from typing import List
 
 import azure.functions as func
+import numpy as np
+from pydantic import BaseModel, Field, ValidationError, field_validator
 
-TASKTRACKER_AVAILABLE = True
+
+# Pydantic Models for Request/Response Validation
+class PredictRequest(BaseModel):
+    model: str = Field(..., description="Model name (e.g., 'llama3_8b')")
+    probe_type: str = Field(default="linear_probe", description="Type of probe")
+    layer: int = Field(..., ge=0, description="Layer number (must be >= 0)")
+    primary_activations: List[float] = Field(..., description="Primary activation values")
+    text_activations: List[float] = Field(..., description="Text activation values")
+    
+    @field_validator('primary_activations', 'text_activations')
+    @classmethod
+    def validate_activations_length(cls, v: List[float]) -> List[float]:
+        if len(v) != 4096:
+            raise ValueError('Activations must have exactly 4096 dimensions')
+        return v
+
+
+class PredictResponse(BaseModel):
+    model: str
+    probe_type: str
+    layer: int
+    predicted_probability: float = Field(..., ge=0.0, le=1.0)
+
+
+class ProbeInfo(BaseModel):
+    model: str
+    probe_type: str
+    layers: List[int]
+
+
+class ProbesResponse(BaseModel):
+    probes: List[ProbeInfo]
 
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
@@ -36,54 +68,82 @@ def predict(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Predict endpoint was triggered.')
 
     try:
-        # Parse request body
-        req_body = req.get_json()
-        if not req_body:
+        # Parse and validate request using Pydantic
+        request_data = PredictRequest.model_validate_json(req.get_body())
+        logging.info(f"Request validated for model: {request_data.model}, layer: {request_data.layer}")
+        
+        # Load the probe
+        probe_dir = Path(__file__).parent.parent / "models" / "trained_linear_probes" / request_data.model / str(request_data.layer)
+        model_file = probe_dir / "model.pickle"
+        
+        if not model_file.exists():
             return func.HttpResponse(
-                json.dumps({"error": "Request body is required"}),
-                status_code=400,
+                json.dumps({"error": f"Probe not found for model '{request_data.model}' at layer {request_data.layer}"}),
+                status_code=404,
                 mimetype="application/json"
             )
-
-        # Extract input data
-        input_text = req_body.get('text', '')
-        model_type = req_body.get('model_type', 'default')
-
-        if not input_text:
-            return func.HttpResponse(
-                json.dumps({"error": "Text input is required"}),
-                status_code=400,
-                mimetype="application/json"
-            )
-
-        # Example: Use TaskTracker's linear_probe if available
-        if TASKTRACKER_AVAILABLE:
-            # Replace this with your actual TaskTracker logic
-            # For demonstration, just echo input
-            prediction = f"Processed by TaskTracker: {input_text}"
-            confidence = 0.99
-            processed = True
+        
+        # Load the probe model
+        with open(model_file, 'rb') as f:
+            probe_model = pickle.load(f)
+            
+        logging.info(f"Successfully loaded probe for {request_data.model} layer {request_data.layer}")
+        
+        # Compute delta and make prediction
+        primary_activations = np.array(request_data.primary_activations)
+        text_activations = np.array(request_data.text_activations)
+        delta = primary_activations - text_activations
+        
+        # Reshape for model input
+        if len(delta.shape) == 1:
+            delta = delta.reshape(1, -1)
+        
+        # Get prediction probability
+        if hasattr(probe_model, 'predict_proba'):
+            prediction_proba = probe_model.predict_proba(delta)
+            predicted_probability = float(prediction_proba[0][1]) if prediction_proba.shape[1] > 1 else float(prediction_proba[0][0])
+        elif hasattr(probe_model, 'predict'):
+            prediction = probe_model.predict(delta)
+            predicted_probability = float(prediction[0])
         else:
-            prediction = "mock_prediction"
-            confidence = 0.0
-            processed = False
-
-        result = {
-            "input_text": input_text,
-            "model_type": model_type,
-            "prediction": prediction,
-            "confidence": confidence,
-            "processed": processed
-        }
-
+            return func.HttpResponse(
+                json.dumps({"error": "Probe model does not support prediction"}),
+                status_code=500,
+                mimetype="application/json"
+            )
+        
+        logging.info(f"Predicted probability: {predicted_probability}")
+        
+        # Create and return response using Pydantic
+        response = PredictResponse(
+            model=request_data.model,
+            probe_type=request_data.probe_type,
+            layer=request_data.layer,
+            predicted_probability=predicted_probability
+        )
+        
         return func.HttpResponse(
-            json.dumps(result),
+            response.model_dump_json(),
             status_code=200,
             mimetype="application/json"
         )
-
+        
+    except ValidationError as e:
+        logging.error(f"Validation error: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Validation failed", "details": [{"field": err["loc"][-1], "message": err["msg"]} for err in e.errors()]}),
+            status_code=400,
+            mimetype="application/json"
+        )
+    except FileNotFoundError as e:
+        logging.error(f"Probe file not found: {e}")
+        return func.HttpResponse(
+            json.dumps({"error": "Probe file not found"}),
+            status_code=404,
+            mimetype="application/json"
+        )
     except Exception as e:
-        logging.error("Error in predict endpoint: %s", str(e))
+        logging.error(f"Error in predict endpoint: {str(e)}")
         return func.HttpResponse(
             json.dumps({"error": f"Internal server error: {str(e)}"}),
             status_code=500,
@@ -111,7 +171,7 @@ def list_probes(req: func.HttpRequest) -> func.HttpResponse:
                     layers = []
 
                     # Iterate through each layer directory within the model
-                    for layer_dir in model_dir.iterdir():
+                    for layer_dir in sorted(model_dir.iterdir()):
                         if layer_dir.is_dir() and layer_dir.name.isdigit():
                             layer_num = int(layer_dir.name)
 
@@ -122,18 +182,18 @@ def list_probes(req: func.HttpRequest) -> func.HttpResponse:
                             if config_file.exists() and model_file.exists():
                                 layers.append(layer_num)
 
-                    # Sort layers by layer number
-                    layers.sort()  # Simple numeric sort since layers are now just integers
+                    # Only include models that have available layers
+                    if layers:
+                        probe_info = ProbeInfo(
+                            model=model_name,
+                            probe_type="linear_probe",
+                            layers=layers
+                        )
+                        probes.append(probe_info)
 
-                    if layers:  # Only include models that have available layers
-                        probes.append({
-                            "model": model_name,
-                            "type": "linear_probe",
-                            "layers": layers
-                        })
-
+        response = ProbesResponse(probes=probes)
         return func.HttpResponse(
-            json.dumps({"probes": probes}),
+            response.model_dump_json(),
             status_code=200,
             mimetype="application/json"
         )
