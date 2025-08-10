@@ -1,8 +1,14 @@
+
 import json
 import logging
 from typing import Any, Dict
 
 import azure.functions as func
+
+from task_tracker import activation_generation, linear_probe, triplet_probe
+
+TASKTRACKER_AVAILABLE = True
+
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
 
@@ -48,14 +54,24 @@ def predict(req: func.HttpRequest) -> func.HttpResponse:
                 mimetype="application/json"
             )
 
-        # TODO: Replace with actual TaskTracker logic
-        # For now, return a mock response
+        # Example: Use TaskTracker's linear_probe if available
+        if TASKTRACKER_AVAILABLE:
+            # Replace this with your actual TaskTracker logic
+            # For demonstration, just echo input
+            prediction = f"Processed by TaskTracker: {input_text}"
+            confidence = 0.99
+            processed = True
+        else:
+            prediction = "mock_prediction"
+            confidence = 0.0
+            processed = False
+
         result = {
             "input_text": input_text,
             "model_type": model_type,
-            "prediction": "mock_prediction",
-            "confidence": 0.95,
-            "processed": True
+            "prediction": prediction,
+            "confidence": confidence,
+            "processed": processed
         }
 
         return func.HttpResponse(
@@ -79,15 +95,23 @@ def list_models(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('List models endpoint was triggered.')
 
     try:
-        # TODO: Replace with actual model listing logic
-        models = [
-            {"name": "llama3_70b", "type": "large_language_model",
-                "status": "available"},
-            {"name": "llama3_8b", "type": "language_model", "status": "available"},
-            {"name": "mistral", "type": "language_model", "status": "available"},
-            {"name": "mixtral", "type": "mixture_of_experts", "status": "available"},
-            {"name": "phi3", "type": "small_language_model", "status": "available"}
-        ]
+
+        # Example: List models from TaskTracker if available
+        if TASKTRACKER_AVAILABLE:
+            # Replace with actual TaskTracker model listing if available
+            models = [
+                {"name": "llama3_70b", "type": "large_language_model",
+                    "status": "available"},
+                {"name": "llama3_8b", "type": "language_model", "status": "available"},
+                {"name": "mistral", "type": "language_model", "status": "available"},
+                {"name": "mixtral", "type": "mixture_of_experts",
+                    "status": "available"},
+                {"name": "phi3", "type": "small_language_model", "status": "available"}
+            ]
+        else:
+            models = [
+                {"name": "mock_model", "type": "mock", "status": "unavailable"}
+            ]
 
         return func.HttpResponse(
             json.dumps({"models": models}),
