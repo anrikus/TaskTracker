@@ -1,7 +1,9 @@
 
 import json
 import logging
-from typing import Any, Dict
+import os
+from pathlib import Path
+from typing import Any, Dict, List
 
 import azure.functions as func
 
@@ -89,38 +91,54 @@ def predict(req: func.HttpRequest) -> func.HttpResponse:
         )
 
 
-@app.route(route="v1/models", methods=["GET"])
-def list_models(req: func.HttpRequest) -> func.HttpResponse:
-    """List available models endpoint"""
-    logging.info('List models endpoint was triggered.')
+@app.route(route="v1/probes", methods=["GET"])
+def list_probes(req: func.HttpRequest) -> func.HttpResponse:
+    """List available probes endpoint"""
+    logging.info('List probes endpoint was triggered.')
 
     try:
-
-        # Example: List models from TaskTracker if available
-        if TASKTRACKER_AVAILABLE:
-            # Replace with actual TaskTracker model listing if available
-            models = [
-                {"name": "llama3_70b", "type": "large_language_model",
-                    "status": "available"},
-                {"name": "llama3_8b", "type": "language_model", "status": "available"},
-                {"name": "mistral", "type": "language_model", "status": "available"},
-                {"name": "mixtral", "type": "mixture_of_experts",
-                    "status": "available"},
-                {"name": "phi3", "type": "small_language_model", "status": "available"}
-            ]
-        else:
-            models = [
-                {"name": "mock_model", "type": "mock", "status": "unavailable"}
-            ]
-
+        probes = []
+        
+        # Path to the trained linear probes directory
+        probes_dir = Path(__file__).parent.parent / "models" / "trained_linear_probes"
+        
+        if probes_dir.exists():
+            # Iterate through each model directory
+            for model_dir in probes_dir.iterdir():
+                if model_dir.is_dir():
+                    model_name = model_dir.name
+                    layers = []
+                    
+                    # Iterate through each layer directory within the model
+                    for layer_dir in model_dir.iterdir():
+                        if layer_dir.is_dir() and layer_dir.name.isdigit():
+                            layer_num = int(layer_dir.name)
+                            
+                            # Check if this layer has the required files
+                            config_file = layer_dir / "config.json"
+                            model_file = layer_dir / "model.pickle"
+                            
+                            if config_file.exists() and model_file.exists():
+                                layers.append(layer_num)
+                    
+                    # Sort layers by layer number
+                    layers.sort()  # Simple numeric sort since layers are now just integers
+                    
+                    if layers:  # Only include models that have available layers
+                        probes.append({
+                            "model": model_name,
+                            "type": "linear_probe",
+                            "layers": layers
+                        })
+        
         return func.HttpResponse(
-            json.dumps({"models": models}),
+            json.dumps({"probes": probes}),
             status_code=200,
             mimetype="application/json"
         )
 
     except Exception as e:
-        logging.error(f"Error in list_models endpoint: {str(e)}")
+        logging.error("Error in list_probes endpoint: %s", str(e))
         return func.HttpResponse(
             json.dumps({"error": f"Internal server error: {str(e)}"}),
             status_code=500,
