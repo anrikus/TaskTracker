@@ -1,0 +1,13 @@
+{
+    "recommendations": [
+        "ms-python.python",
+        "ms-azuretools.vscode-docker",
+        "ms-python.vscode-pylance",
+        "ms-python.debugpy",
+        "ms-python.pylint",
+        "ms-python.isort",
+        "ms-python.mypy-type-checker",
+        "ms-toolsai.jupyter",
+        "bierner.markdown-mermaid"
+    ]
+}
