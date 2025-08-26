@@ -1,20 +1,28 @@
 {
-	"editor.codeActionsOnSave": {
-		"source.organizeImports": "always"
-	},
-	"editor.formatOnSave": true,
-	"python.defaultInterpreterPath": "./.venv/bin/python",
-	"python.formatting.provider": "black",
-	"python.linting.enabled": true,
-	"python.linting.pylintArgs": [
-		"--disable=C0111"
-	],
-	"python.linting.pylintEnabled": true,
-	"python.sortImports.args": [
-		"--profile",
-		"black"
-	],
-	"python.terminal.activateEnvInCurrentTerminal": true,
-	"python.terminal.activateEnvironment": true,
-	"python.typeChecking": "basic"
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "explicit",
+        "source.organizeImports": "explicit",
+        "source.sort.json": "explicit",
+        "source.unusedImports": "explicit"
+    },
+    "editor.formatOnSave": true,
+    "isort.args": [
+        "--profile",
+        "black"
+    ],
+    "isort.importStrategy": "fromEnvironment",
+    "python.defaultInterpreterPath": "./.venv/bin/python",
+    "python.formatting.provider": "black",
+    "python.linting.enabled": true,
+    "python.linting.pylintArgs": [
+        "--disable=C0111"
+    ],
+    "python.linting.pylintEnabled": true,
+    "python.sortImports.args": [
+        "--profile",
+        "black"
+    ],
+    "python.terminal.activateEnvInCurrentTerminal": true,
+    "python.terminal.activateEnvironment": true,
+    "python.typeChecking": "basic"
 }

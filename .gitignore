@@ -220,3 +220,4 @@ _activations_old/*
 *.pyc
 .specstory/*
 disk1/*
+*/model_cache
