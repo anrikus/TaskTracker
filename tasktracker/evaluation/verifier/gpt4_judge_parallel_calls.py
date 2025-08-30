@@ -1,4 +1,3 @@
-import argparse
 import concurrent.futures
 import json
 import os
@@ -8,10 +7,10 @@ from gpt4_judge import Judge
 from tqdm import tqdm
 
 ## change the paths of dataset text files
-from task_tracker.config.models import data
+from tasktracker.config.models import data
 
 ## change the paths of output files
-from task_tracker.experiments_outputs import (
+from tasktracker.experiments_outputs import (
     MODELS_RESPONSE_OUT_FILENAME_PER_MODEL,
     VERIFIER_RESPONSE_OUT_FILENAME_PER_MODEL,
 )

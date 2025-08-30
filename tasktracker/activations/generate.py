@@ -3,12 +3,12 @@ import logging
 
 import torch
 
-from task_tracker.config.models import cache_dir, models
-from task_tracker.utils.activations import (
+from tasktracker.config.models import cache_dir, models
+from tasktracker.utils.activations import (
     process_texts_in_batches,
     process_texts_in_batches_pairs,
 )
-from task_tracker.utils.model import load_model
+from tasktracker.utils.model import load_model
 
 # NOTE: Configuration
 # Update the model name to the model you want to generate activations for (from models in task_tracker.config.models)

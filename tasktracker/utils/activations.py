@@ -6,8 +6,8 @@ from datetime import datetime
 import torch
 from tqdm import tqdm
 
-from task_tracker.models.model import Model
-from task_tracker.utils.data import format_prompts
+from tasktracker.models.model import Model
+from tasktracker.utils.data import format_prompts
 
 current_dir = os.getcwd()
 parent_dir = os.path.dirname(current_dir)

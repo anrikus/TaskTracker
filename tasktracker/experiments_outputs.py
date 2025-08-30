@@ -1,7 +1,6 @@
-import os
 
 ## directory of dataset (as text)
-from task_tracker.config.models import text_dataset_parent_dir
+from tasktracker.config.models import text_dataset_parent_dir
 
 # Constants for parent dir of experiments outputs
 linear_probe_out_parent_dir = "/home/saabdelnabi/TaskTracker/trained_linear_probes/"

@@ -1,8 +1,6 @@
 import json
 import os
 import pickle
-import sys
-from pprint import pprint
 
 import numpy as np
 from sklearn.linear_model import LogisticRegression
@@ -13,12 +11,12 @@ OUTPUT_DIR = MODEL
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
-from task_tracker.training.dataset import (
+from tasktracker.training.dataset import (
     ActivationsDatasetDynamic,
     ActivationsDatasetDynamicPrimaryText,
 )
-from task_tracker.training.helpers.data import load_file_paths
-from task_tracker.training.utils.constants import (
+from tasktracker.training.helpers.data import load_file_paths
+from tasktracker.training.utils.constants import (
     CONSTANTS_ALL_MODELS,
     OOD_POISONED_FILE,
 )

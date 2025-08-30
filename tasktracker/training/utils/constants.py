@@ -1,6 +1,6 @@
 import os
 
-from task_tracker.config.models import activation_parent_dir, text_dataset_parent_dir
+from tasktracker.config.models import activation_parent_dir, text_dataset_parent_dir
 
 # == Experiment-wide constants ==
 
