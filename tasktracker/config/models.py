@@ -6,17 +6,16 @@ import torch
 from tasktracker.models.model import Model
 
 # Set the cache directory for Hugging Face transformers
-cache_dir = "/disk1/"
+cache_dir = "../../disk1/"
 os.environ["TRANSFORMERS_CACHE"] = cache_dir
 os.environ["HF_HOME"] = cache_dir
 
 # Directory where model activation data will be stored
-activation_parent_dir = "/disk3/activations/"
+activation_parent_dir = "../../disk3/activations/"
 
 # Directory where the dataset text files are stored
 text_dataset_parent_dir = (
-    "/home/saabdelnabi/TaskTracker/task_tracker/dataset_creation/dataset_sampled"
-)
+    os.path.join(os.path.abspath(__file__), os.path.pardir, "dataset_creation/dataset_sampled"))
 
 # Paths to dataset files
 data = {
@@ -72,6 +71,14 @@ mixtral = Model(
     torch_dtype=torch.float16,
 )
 
+gpt_oss_20b = Model(
+    name="openai/gpt-oss-20b",
+    output_dir=os.path.join(activation_parent_dir, "gpt_oss_20b"),
+    data=data,
+    subset="train",
+    torch_dtype=torch.float16,
+)
+
 # Dictionary of models for easy access
 models: Dict[str, Model] = {
     "llama3_70b": llama_3_70B,
@@ -79,4 +86,5 @@ models: Dict[str, Model] = {
     "mistral": mistral_7B,
     "phi3": phi3,
     "mixtral": mixtral,
+    "gpt_oss_20b": gpt_oss_20b
 }

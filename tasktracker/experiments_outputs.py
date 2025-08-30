@@ -1,9 +1,11 @@
 ## directory of dataset (as text)
+import os
+
 from tasktracker.config.models import text_dataset_parent_dir
 
 # Constants for parent dir of experiments outputs
-linear_probe_out_parent_dir = "/home/saabdelnabi/TaskTracker/trained_linear_probes/"
-triplet_probe_out_parent_dir = "/home/saabdelnabi/TaskTracker/trained_triplet_probes"
+linear_probe_out_parent_dir = os.path.join(os.path.abspath(__file__), os.path.pardir, "trained_linear_probes/")
+triplet_probe_out_parent_dir = os.path.join(os.path.abspath(__file__), os.path.pardir, "trained_triplet_probes")
 
 MODELS_RESPONSE_OUT_FILENAME_PER_MODEL = {
     "mistral": text_dataset_parent_dir
@@ -12,6 +14,8 @@ MODELS_RESPONSE_OUT_FILENAME_PER_MODEL = {
     + "/mixtral_responses/dataset_out_poisoned_test_mixtral_response.json",
     "llama3_8b": text_dataset_parent_dir
     + "/llama3_8b_responses/dataset_out_poisoned_test_llama3_8b_response.json",
+    "gpt_oss_20b": text_dataset_parent_dir
+    + "/gpt_oss_20b_responses/dataset_out_poisoned_test_gpt_oss_20b_response.json",
 }
 
 VERIFIER_RESPONSE_OUT_FILENAME_PER_MODEL = {
@@ -21,6 +25,8 @@ VERIFIER_RESPONSE_OUT_FILENAME_PER_MODEL = {
     + "/mixtral_responses/dataset_out_poisoned_test_mixtral_response_verifier.json",
     "llama3_8b": text_dataset_parent_dir
     + "/llama3_8b_responses/dataset_out_poisoned_test_llama3_8b_response_verifier.json",
+    "gpt_oss_20b": text_dataset_parent_dir
+    + "/gpt_oss_20b_responses/dataset_out_poisoned_test_gpt_oss_20b_response_verifier.json",
 }
 
 
@@ -74,6 +80,12 @@ LINEAR_PROBES_PATHS_PER_MODEL = {
         linear_probe_out_parent_dir + "/llama3_70b/71/model.pickle": 71,
         linear_probe_out_parent_dir + "/llama3_70b/79/model.pickle": 79,
     },
+    "gpt_oss_20b": {
+        linear_probe_out_parent_dir + "/gpt_oss_20b/0/model.pickle": 0,
+        linear_probe_out_parent_dir + "/gpt_oss_20b/7/model.pickle": 7,
+        linear_probe_out_parent_dir + "/gpt_oss_20b/15/model.pickle": 15,
+        linear_probe_out_parent_dir + "/gpt_oss_20b/23/model.pickle": 23,
+    },
 }
 
 
@@ -108,4 +120,11 @@ TRIPLET_PROBES_PATHS_PER_MODEL = {
         "saved_embs_clean": "clean_embeddings_20240725-154429.json",
         "saved_embs_poisoned": "poisoned_embeddings_20240725-154632.json",
     },
+    "gpt_oss_20b": {
+        "path": triplet_probe_out_parent_dir + "/gpt_oss_20b_best/",
+        "num_layers": (0, 5),
+        "saved_embs_clean": "clean_embeddings_20250830-154429.json",
+        "saved_embs_poisoned": "poisoned_embeddings_20250830-154632.json",
+    },
+    
 }
