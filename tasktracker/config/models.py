@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from typing import Dict
 
 import torch
@@ -6,16 +7,16 @@ import torch
 from tasktracker.models.model import Model
 
 # Set the cache directory for Hugging Face transformers
-cache_dir = "../../disk1/"
+cache_dir = str(os.path.join(Path(__file__).resolve().parent.parent.parent, "disk1/"))
 os.environ["TRANSFORMERS_CACHE"] = cache_dir
 os.environ["HF_HOME"] = cache_dir
 
 # Directory where model activation data will be stored
-activation_parent_dir = "../../disk3/activations/"
+activation_parent_dir = str(os.path.join(Path(__file__).resolve().parent.parent.parent, "disk3/activations/"))
 
 # Directory where the dataset text files are stored
-text_dataset_parent_dir = (
-    os.path.join(os.path.abspath(__file__), os.path.pardir, "dataset_creation/dataset_sampled"))
+text_dataset_parent_dir = str(
+    os.path.join(Path(__file__).resolve().parent.parent, "dataset_creation/dataset_sampled"))
 
 # Paths to dataset files
 data = {
@@ -76,8 +77,17 @@ gpt_oss_20b = Model(
     output_dir=os.path.join(activation_parent_dir, "gpt_oss_20b"),
     data=data,
     subset="train",
-    torch_dtype=torch.float16,
+    torch_dtype=torch.bfloat16,
 )
+
+gpt_oss_120b = Model(
+    name="openai/gpt-oss-120b",
+    output_dir=os.path.join(activation_parent_dir, "gpt_oss_120b"),
+    data=data,
+    subset="train",
+    torch_dtype=torch.bfloat16,
+)
+
 
 # Dictionary of models for easy access
 models: Dict[str, Model] = {
@@ -86,5 +96,6 @@ models: Dict[str, Model] = {
     "mistral": mistral_7B,
     "phi3": phi3,
     "mixtral": mixtral,
-    "gpt_oss_20b": gpt_oss_20b
+    "gpt_oss_20b": gpt_oss_20b,
+    "gpt_oss_120b": gpt_oss_120b,
 }

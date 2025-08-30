@@ -16,6 +16,8 @@ MODELS_RESPONSE_OUT_FILENAME_PER_MODEL = {
     + "/llama3_8b_responses/dataset_out_poisoned_test_llama3_8b_response.json",
     "gpt_oss_20b": text_dataset_parent_dir
     + "/gpt_oss_20b_responses/dataset_out_poisoned_test_gpt_oss_20b_response.json",
+    "gpt_oss_120b": text_dataset_parent_dir
+    + "/gpt_oss_120b_responses/dataset_out_poisoned_test_gpt_oss_120b_response.json",
 }
 
 VERIFIER_RESPONSE_OUT_FILENAME_PER_MODEL = {
@@ -27,6 +29,8 @@ VERIFIER_RESPONSE_OUT_FILENAME_PER_MODEL = {
     + "/llama3_8b_responses/dataset_out_poisoned_test_llama3_8b_response_verifier.json",
     "gpt_oss_20b": text_dataset_parent_dir
     + "/gpt_oss_20b_responses/dataset_out_poisoned_test_gpt_oss_20b_response_verifier.json",
+    "gpt_oss_120b": text_dataset_parent_dir
+    + "/gpt_oss_120b_responses/dataset_out_poisoned_test_gpt_oss_120b_response_verifier.json",
 }
 
 
@@ -86,6 +90,14 @@ LINEAR_PROBES_PATHS_PER_MODEL = {
         linear_probe_out_parent_dir + "/gpt_oss_20b/15/model.pickle": 15,
         linear_probe_out_parent_dir + "/gpt_oss_20b/23/model.pickle": 23,
     },
+    "gpt_oss_120b": {
+        linear_probe_out_parent_dir + "/gpt_oss_120b/0/model.pickle": 0,
+        linear_probe_out_parent_dir + "/gpt_oss_120b/7/model.pickle": 7,
+        linear_probe_out_parent_dir + "/gpt_oss_120b/15/model.pickle": 15,
+        linear_probe_out_parent_dir + "/gpt_oss_120b/23/model.pickle": 23,
+        linear_probe_out_parent_dir + "/gpt_oss_120b/31/model.pickle": 31,
+        linear_probe_out_parent_dir + "/gpt_oss_120b/35/model.pickle": 35,
+    },
 }
 
 
@@ -119,12 +131,5 @@ TRIPLET_PROBES_PATHS_PER_MODEL = {
         "num_layers": (0, 5),
         "saved_embs_clean": "clean_embeddings_20240725-154429.json",
         "saved_embs_poisoned": "poisoned_embeddings_20240725-154632.json",
-    },
-    "gpt_oss_20b": {
-        "path": triplet_probe_out_parent_dir + "/gpt_oss_20b_best/",
-        "num_layers": (0, 5),
-        "saved_embs_clean": "clean_embeddings_20250830-154429.json",
-        "saved_embs_poisoned": "poisoned_embeddings_20250830-154632.json",
-    },
-    
+    }
 }

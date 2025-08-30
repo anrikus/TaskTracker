@@ -60,6 +60,11 @@ CONSTANTS_ALL_MODELS = {
         "ACTIVATIONS_DIR": activation_parent_dir + "/gpt_oss_20b/training",
         "ACTIVATIONS_VAL_DIR": activation_parent_dir + "/gpt_oss_20b/test",
     },
+    "gpt_oss_120b": {
+        "ACTIVATION_FILE_LIST_DIR": DATA_LISTS,
+        "ACTIVATIONS_DIR": activation_parent_dir + "/gpt_oss_120b/training",
+        "ACTIVATIONS_VAL_DIR": activation_parent_dir + "/gpt_oss_120b/test",
+    },
 }
 
 # Directory of activations of test data
@@ -70,7 +75,8 @@ TEST_ACTIVATIONS_DIR_PER_MODEL = {
     "phi3": activation_parent_dir + "/phi3/test",
     "mistral_no_priming": activation_parent_dir + "/mistral_no_priming/test",
     "llama3_70b": activation_parent_dir + "/llama_3_70B_Instruct/test",
-    "gpt_oss_20b": activation_parent_dir + "/gpt_oss_20b_no_priming/test",
+    "gpt_oss_20b": activation_parent_dir + "/gpt_oss_20b/test",
+    "gpt_oss_120b": activation_parent_dir + "/gpt_oss_120b/test",
 }
 
 
@@ -106,6 +112,10 @@ TEST_CLEAN_FILES_PER_MODEL = {
         file.strip()
         for file in open(os.path.join(DATA_LISTS, "test_clean_files_gpt_oss_20b.txt"))
     ],
+    "gpt_oss_120b": [
+        file.strip()
+        for file in open(os.path.join(DATA_LISTS, "test_clean_files_gpt_oss_120b.txt"))
+    ],
 }
 
 # Activations text files of test data (poisoned)
@@ -139,5 +149,9 @@ TEST_POISONED_FILES_PER_MODEL = {
     "gpt_oss_20b": [
         file.strip()
         for file in open(os.path.join(DATA_LISTS, "test_poisoned_files_gpt_oss_20b.txt"))
+    ],
+    "gpt_oss_120b": [
+        file.strip()
+        for file in open(os.path.join(DATA_LISTS, "test_poisoned_files_gpt_oss_120b.txt"))
     ],
 }
