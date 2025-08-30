@@ -1,4 +1,3 @@
-
 ## directory of dataset (as text)
 from tasktracker.config.models import text_dataset_parent_dir
 

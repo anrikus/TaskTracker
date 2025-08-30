@@ -220,4 +220,13 @@ _activations_old/*
 *.pyc
 .specstory/*
 disk1/*
+disk3/*
 */model_cache
+tasktracker/dataset_creation/datasets/hotpot/*
+tasktracker/dataset_creation/datasets/SQuAD/*
+tasktracker/dataset_creation/datasets/TrustLLM/*
+tasktracker/dataset_creation/datasets/forbidden_question_set.csv
+tasktracker/dataset_creation/datasets/harmful_behaviors.csv
+tasktracker/dataset_creation/dataset_sampled/dataset_*
+tasktracker/dataset_creation/dataset_sampled/train_subset.json
+
