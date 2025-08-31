@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from tasktracker.config.models import activation_parent_dir, text_dataset_parent_dir
 
@@ -6,9 +7,9 @@ from tasktracker.config.models import activation_parent_dir, text_dataset_parent
 
 
 # Directory contain text files of activations lists
-DATA_LISTS = os.path.join(os.path.abspath(__file__), os.path.pardir, os.path.pardir, "data")
+DATA_LISTS = os.path.join(Path(__file__).parent.parent.parent, "data")
 # The output directory to store output models per epoch and the best running model
-MODEL_OUTPUT_DIR = os.path.join(os.path.abspath(__file__), os.path.pardir, os.path.pardir, "output_dir")
+MODEL_OUTPUT_DIR = os.path.join(Path(__file__).parent.parent.parent, "output_dir")
 # Directory of the text of sampled training examples
 TRAINING_TEXT_DIR = text_dataset_parent_dir
 # OOD poisoned file (validation)
@@ -57,14 +58,9 @@ CONSTANTS_ALL_MODELS = {
     },
     "gpt_oss_20b": {
         "ACTIVATION_FILE_LIST_DIR": DATA_LISTS,
-        "ACTIVATIONS_DIR": activation_parent_dir + "/gpt_oss_20b/training",
-        "ACTIVATIONS_VAL_DIR": activation_parent_dir + "/gpt_oss_20b/test",
-    },
-    "gpt_oss_120b": {
-        "ACTIVATION_FILE_LIST_DIR": DATA_LISTS,
-        "ACTIVATIONS_DIR": activation_parent_dir + "/gpt_oss_120b/training",
-        "ACTIVATIONS_VAL_DIR": activation_parent_dir + "/gpt_oss_120b/test",
-    },
+        "ACTIVATIONS_DIR": activation_parent_dir + "gpt_oss_20b/training",
+        "ACTIVATIONS_VAL_DIR": activation_parent_dir + "gpt_oss_20b/validation",
+    }
 }
 
 # Directory of activations of test data
@@ -75,10 +71,8 @@ TEST_ACTIVATIONS_DIR_PER_MODEL = {
     "phi3": activation_parent_dir + "/phi3/test",
     "mistral_no_priming": activation_parent_dir + "/mistral_no_priming/test",
     "llama3_70b": activation_parent_dir + "/llama_3_70B_Instruct/test",
-    "gpt_oss_20b": activation_parent_dir + "/gpt_oss_20b/test",
-    "gpt_oss_120b": activation_parent_dir + "/gpt_oss_120b/test",
+    "gpt_oss_20b": activation_parent_dir + "gpt_oss_20b/test",
 }
-
 
 # Activations text files of test data (clean)
 TEST_CLEAN_FILES_PER_MODEL = {
@@ -111,10 +105,6 @@ TEST_CLEAN_FILES_PER_MODEL = {
     "gpt_oss_20b": [
         file.strip()
         for file in open(os.path.join(DATA_LISTS, "test_clean_files_gpt_oss_20b.txt"))
-    ],
-    "gpt_oss_120b": [
-        file.strip()
-        for file in open(os.path.join(DATA_LISTS, "test_clean_files_gpt_oss_120b.txt"))
     ],
 }
 
@@ -149,9 +139,5 @@ TEST_POISONED_FILES_PER_MODEL = {
     "gpt_oss_20b": [
         file.strip()
         for file in open(os.path.join(DATA_LISTS, "test_poisoned_files_gpt_oss_20b.txt"))
-    ],
-    "gpt_oss_120b": [
-        file.strip()
-        for file in open(os.path.join(DATA_LISTS, "test_poisoned_files_gpt_oss_120b.txt"))
     ],
 }

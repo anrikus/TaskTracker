@@ -229,4 +229,5 @@ tasktracker/dataset_creation/datasets/forbidden_question_set.csv
 tasktracker/dataset_creation/datasets/harmful_behaviors.csv
 tasktracker/dataset_creation/dataset_sampled/dataset_*
 tasktracker/dataset_creation/dataset_sampled/train_subset.json
-
+tasktracker/evaluation/linear_probe/images/*
+tasktracker/evaluation/linear_probe/metrics/*

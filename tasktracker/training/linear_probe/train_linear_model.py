@@ -1,13 +1,14 @@
 import json
 import os
 import pickle
+from pathlib import Path
 
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 from tqdm import tqdm
 
-MODEL = "phi3"
-OUTPUT_DIR = MODEL
+MODEL = "gpt_oss_20b"
+OUTPUT_DIR = str(Path(__file__).parent.parent.parent.parent / "trained_linear_probes" / MODEL)
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
@@ -29,6 +30,7 @@ LAYERS_PER_MODEL = {
     "mistral": [0, 7, 15, 23, 31],
     "llama3_8b": [0, 7, 15, 23, 31],
     "mistral_no_priming": [0, 7, 15, 23, 31],
+    "gpt_oss_20b": [0, 7, 15, 23],
 }
 
 
@@ -128,6 +130,7 @@ if __name__ == "__main__":
 
         model = train_model(train_files, num_layers=(n_layer, n_layer))
         pickle.dump(model, open(os.path.join(layer_output_dir, "model.pickle"), "wb"))
+        print(f"""Model saved at {os.path.abspath(os.path.join(layer_output_dir, "model.pickle"))}""")
 
         # Evaluate.
         X_eval, y_eval = load_evaluation_data(
