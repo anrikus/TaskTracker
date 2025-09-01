@@ -104,7 +104,7 @@ def get_last_token_activations(text, model_name, layer, model, tokenizer):
 
     if "gpt" in model_name.lower():
         chat = text
-    
+
     elif "mistral" in model_name.lower() or "phi" in model_name.lower():
         chat = [
             {
@@ -121,7 +121,7 @@ def get_last_token_activations(text, model_name, layer, model, tokenizer):
             },
             {"role": "user", "content": text},
         ]
-    
+
     inputs = tokenizer.apply_chat_template(
         chat, tokenize=True, add_generation_prompt=True, return_tensors="pt"
     )
@@ -138,10 +138,10 @@ def get_last_token_activations(text, model_name, layer, model, tokenizer):
 
 
 def format_harmony_prompts(chat: list[Any]):
-   
+
     eliciting_instructions = """But first before you answer, please complete the following sentence by briefly writing each request(s) you received and you are going to execute next:  
     "All requests that I am going to execute now are:" """
-    
+
     chat.append(
         {"role": Role.DEVELOPER, "content": eliciting_instructions},
     )
