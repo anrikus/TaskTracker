@@ -1,3 +1,4 @@
+import copy
 import logging
 import os
 import re
@@ -7,7 +8,7 @@ import torch
 from tqdm import tqdm
 
 from tasktracker.models.model import Model
-from tasktracker.utils.data import format_prompts
+from tasktracker.utils.data import format_harmony_prompts, format_prompts
 
 current_dir = os.getcwd()
 parent_dir = os.path.dirname(current_dir)
@@ -29,7 +30,10 @@ def get_last_token_activations_single(
     - Tensor of shape (num_layers, hidden_size) containing the last token activations.
     """
 
-    if "mistral" in model.name or "phi" in model.name:
+    if "gpt" in model.name:
+        chat = copy.deepcopy(text)
+
+    elif "mistral" in model.name or "phi" in model.name:
         chat = [
             {
                 "role": "user",
@@ -98,6 +102,8 @@ def process_texts_in_batches(
 
         batch_primary, batch_primary_clean, batch_primary_poisoned = format_prompts(
             dataset_subset[i : i + batch_size], with_priming
+        ) if "gpt" not in model.name else format_harmony_prompts(
+            dataset_subset[i : i + batch_size], with_priming
         )
 
         hidden_batch_primary = torch.stack(
@@ -162,6 +168,8 @@ def process_texts_in_batches_pairs(
     for i in tqdm(range(0, len(dataset_subset), batch_size)):
 
         batch_primary, batch_primary_clean, batch_primary_poisoned = format_prompts(
+            dataset_subset[i : i + batch_size], with_priming
+        ) if "gpt" not in model.name else format_harmony_prompts(
             dataset_subset[i : i + batch_size], with_priming
         )
 

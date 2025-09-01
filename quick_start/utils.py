@@ -1,12 +1,11 @@
 import logging
 import os
 import pickle
-import subprocess
 from typing import Dict
 
 import torch
 import yaml
-from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer, pipeline
+from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
 
 # Task Tracker prompts
 SEP_PROMPT = (
