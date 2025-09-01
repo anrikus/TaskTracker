@@ -100,10 +100,12 @@ def process_texts_in_batches(
 
     for i in tqdm(range(0, len(dataset_subset), batch_size)):
 
-        batch_primary, batch_primary_clean, batch_primary_poisoned = format_prompts(
-            dataset_subset[i : i + batch_size], with_priming
-        ) if "gpt" not in model.name else format_harmony_prompts(
-            dataset_subset[i : i + batch_size], with_priming
+        batch_primary, batch_primary_clean, batch_primary_poisoned = (
+            format_prompts(dataset_subset[i : i + batch_size], with_priming)
+            if "gpt" not in model.name
+            else format_harmony_prompts(
+                dataset_subset[i : i + batch_size], with_priming
+            )
         )
 
         hidden_batch_primary = torch.stack(
@@ -167,10 +169,12 @@ def process_texts_in_batches_pairs(
 
     for i in tqdm(range(0, len(dataset_subset), batch_size)):
 
-        batch_primary, batch_primary_clean, batch_primary_poisoned = format_prompts(
-            dataset_subset[i : i + batch_size], with_priming
-        ) if "gpt" not in model.name else format_harmony_prompts(
-            dataset_subset[i : i + batch_size], with_priming
+        batch_primary, batch_primary_clean, batch_primary_poisoned = (
+            format_prompts(dataset_subset[i : i + batch_size], with_priming)
+            if "gpt" not in model.name
+            else format_harmony_prompts(
+                dataset_subset[i : i + batch_size], with_priming
+            )
         )
 
         hidden_batch_primary = torch.stack(

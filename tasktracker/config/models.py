@@ -12,11 +12,16 @@ os.environ["TRANSFORMERS_CACHE"] = cache_dir
 os.environ["HF_HOME"] = cache_dir
 
 # Directory where model activation data will be stored
-activation_parent_dir = str(os.path.join(Path(__file__).resolve().parent.parent.parent, "disk3/activations/"))
+activation_parent_dir = str(
+    os.path.join(Path(__file__).resolve().parent.parent.parent, "disk3/activations/")
+)
 
 # Directory where the dataset text files are stored
 text_dataset_parent_dir = str(
-    os.path.join(Path(__file__).resolve().parent.parent, "dataset_creation/dataset_sampled"))
+    os.path.join(
+        Path(__file__).resolve().parent.parent, "dataset_creation/dataset_sampled"
+    )
+)
 
 # Paths to dataset files
 data = {

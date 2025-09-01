@@ -4,8 +4,12 @@ from pathlib import Path
 from tasktracker.config.models import text_dataset_parent_dir
 
 # Constants for parent dir of experiments outputs
-linear_probe_out_parent_dir = os.path.join(Path(__file__).parent.parent, "trained_linear_probes")
-triplet_probe_out_parent_dir = os.path.join(Path(__file__).parent.parent, "trained_triplet_probes")
+linear_probe_out_parent_dir = os.path.join(
+    Path(__file__).parent.parent, "trained_linear_probes"
+)
+triplet_probe_out_parent_dir = os.path.join(
+    Path(__file__).parent.parent, "trained_triplet_probes"
+)
 
 MODELS_RESPONSE_OUT_FILENAME_PER_MODEL = {
     "mistral": text_dataset_parent_dir
@@ -85,7 +89,7 @@ LINEAR_PROBES_PATHS_PER_MODEL = {
         linear_probe_out_parent_dir + "/gpt_oss_20b/7/model.pickle": 7,
         linear_probe_out_parent_dir + "/gpt_oss_20b/15/model.pickle": 15,
         linear_probe_out_parent_dir + "/gpt_oss_20b/23/model.pickle": 23,
-    }
+    },
 }
 
 
@@ -119,5 +123,5 @@ TRIPLET_PROBES_PATHS_PER_MODEL = {
         "num_layers": (0, 5),
         "saved_embs_clean": "clean_embeddings_20240725-154429.json",
         "saved_embs_poisoned": "poisoned_embeddings_20240725-154632.json",
-    }
+    },
 }

@@ -60,7 +60,7 @@ CONSTANTS_ALL_MODELS = {
         "ACTIVATION_FILE_LIST_DIR": DATA_LISTS,
         "ACTIVATIONS_DIR": activation_parent_dir + "gpt_oss_20b/training",
         "ACTIVATIONS_VAL_DIR": activation_parent_dir + "gpt_oss_20b/validation",
-    }
+    },
 }
 
 # Directory of activations of test data
@@ -138,6 +138,8 @@ TEST_POISONED_FILES_PER_MODEL = {
     ],
     "gpt_oss_20b": [
         file.strip()
-        for file in open(os.path.join(DATA_LISTS, "test_poisoned_files_gpt_oss_20b.txt"))
+        for file in open(
+            os.path.join(DATA_LISTS, "test_poisoned_files_gpt_oss_20b.txt")
+        )
     ],
 }

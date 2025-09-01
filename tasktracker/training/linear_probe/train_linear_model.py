@@ -8,7 +8,9 @@ from sklearn.linear_model import LogisticRegression
 from tqdm import tqdm
 
 MODEL = "gpt_oss_20b"
-OUTPUT_DIR = str(Path(__file__).parent.parent.parent.parent / "trained_linear_probes" / MODEL)
+OUTPUT_DIR = str(
+    Path(__file__).parent.parent.parent.parent / "trained_linear_probes" / MODEL
+)
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
@@ -130,7 +132,9 @@ if __name__ == "__main__":
 
         model = train_model(train_files, num_layers=(n_layer, n_layer))
         pickle.dump(model, open(os.path.join(layer_output_dir, "model.pickle"), "wb"))
-        print(f"""Model saved at {os.path.abspath(os.path.join(layer_output_dir, "model.pickle"))}""")
+        print(
+            f"""Model saved at {os.path.abspath(os.path.join(layer_output_dir, "model.pickle"))}"""
+        )
 
         # Evaluate.
         X_eval, y_eval = load_evaluation_data(
