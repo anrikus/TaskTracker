@@ -30,7 +30,7 @@ def get_last_token_activations_single(
     - Tensor of shape (num_layers, hidden_size) containing the last token activations.
     """
 
-    if "gpt" in model.name:
+    if "harmony" in model.name:
         chat = copy.deepcopy(text)
 
     elif "mistral" in model.name or "phi" in model.name:
@@ -102,7 +102,7 @@ def process_texts_in_batches(
 
         batch_primary, batch_primary_clean, batch_primary_poisoned = (
             format_prompts(dataset_subset[i : i + batch_size], with_priming)
-            if "gpt" not in model.name
+            if "harmony" not in model.name
             else format_harmony_prompts(
                 dataset_subset[i : i + batch_size], with_priming
             )
@@ -171,7 +171,7 @@ def process_texts_in_batches_pairs(
 
         batch_primary, batch_primary_clean, batch_primary_poisoned = (
             format_prompts(dataset_subset[i : i + batch_size], with_priming)
-            if "gpt" not in model.name
+            if "harmony" not in model.name
             else format_harmony_prompts(
                 dataset_subset[i : i + batch_size], with_priming
             )

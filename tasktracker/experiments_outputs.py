@@ -18,10 +18,14 @@ MODELS_RESPONSE_OUT_FILENAME_PER_MODEL = {
     + "/mixtral_responses/dataset_out_poisoned_test_mixtral_response.json",
     "llama3_8b": text_dataset_parent_dir
     + "/llama3_8b_responses/dataset_out_poisoned_test_llama3_8b_response.json",
+    "gpt_oss_20b": text_dataset_parent_dir
+    + "/gpt_oss_20b_responses/dataset_out_poisoned_test_gpt_oss_20b_response.json",
+    "gpt_oss_20b_primed": text_dataset_parent_dir
+    + "/gpt_oss_20b_primed_responses/dataset_out_poisoned_test_gpt_oss_20b_primed_response.json",
     "gpt_oss_20b_harmony": text_dataset_parent_dir
-    + "/gpt_oss_20b_responses/dataset_out_poisoned_test_gpt_oss_20b_harmony_response.json",
+    + "/gpt_oss_20b_harmony_responses/dataset_out_poisoned_test_gpt_oss_20b_harmony_response.json",
     "gpt_oss_20b_harmony_primed": text_dataset_parent_dir
-    + "/gpt_oss_20b_responses/dataset_out_poisoned_test_gpt_oss_20b_harmony_primed_response.json",
+    + "/gpt_oss_20b_harmony_primed_responses/dataset_out_poisoned_test_gpt_oss_20b_harmony_primed_response.json",
 }
 
 VERIFIER_RESPONSE_OUT_FILENAME_PER_MODEL = {
@@ -31,10 +35,14 @@ VERIFIER_RESPONSE_OUT_FILENAME_PER_MODEL = {
     + "/mixtral_responses/dataset_out_poisoned_test_mixtral_response_verifier.json",
     "llama3_8b": text_dataset_parent_dir
     + "/llama3_8b_responses/dataset_out_poisoned_test_llama3_8b_response_verifier.json",
+    "gpt_oss_20b": text_dataset_parent_dir
+    + "/gpt_oss_20b_responses/dataset_out_poisoned_test_gpt_oss_20b_response_verifier.json",
+    "gpt_oss_20b_primed": text_dataset_parent_dir
+    + "/gpt_oss_20b_primed_responses/dataset_out_poisoned_test_gpt_oss_20b_primed_response_verifier.json",
     "gpt_oss_20b_harmony": text_dataset_parent_dir
-    + "/gpt_oss_20b_responses/dataset_out_poisoned_test_gpt_oss_20b_harmony_response_verifier.json",
+    + "/gpt_oss_20b_harmony_responses/dataset_out_poisoned_test_gpt_oss_20b_harmony_response_verifier.json",
     "gpt_oss_20b_harmony_primed": text_dataset_parent_dir
-    + "/gpt_oss_20b_responses/dataset_out_poisoned_test_gpt_oss_20b_harmony_primed_response_verifier.json",
+    + "/gpt_oss_20b_harmony_primed_responses/dataset_out_poisoned_test_gpt_oss_20b_harmony_primed_response_verifier.json",
 }
 
 
@@ -87,6 +95,18 @@ LINEAR_PROBES_PATHS_PER_MODEL = {
         linear_probe_out_parent_dir + "/llama3_70b/63/model.pickle": 63,
         linear_probe_out_parent_dir + "/llama3_70b/71/model.pickle": 71,
         linear_probe_out_parent_dir + "/llama3_70b/79/model.pickle": 79,
+    },
+    "gpt_oss_20b": {
+        linear_probe_out_parent_dir + "/gpt_oss_20b/0/model.pickle": 0,
+        linear_probe_out_parent_dir + "/gpt_oss_20b/7/model.pickle": 7,
+        linear_probe_out_parent_dir + "/gpt_oss_20b/15/model.pickle": 15,
+        linear_probe_out_parent_dir + "/gpt_oss_20b/23/model.pickle": 23,
+    },
+    "gpt_oss_20b_primed": {
+        linear_probe_out_parent_dir + "/gpt_oss_20b_primed/0/model.pickle": 0,
+        linear_probe_out_parent_dir + "/gpt_oss_20b_primed/7/model.pickle": 7,
+        linear_probe_out_parent_dir + "/gpt_oss_20b_primed/15/model.pickle": 15,
+        linear_probe_out_parent_dir + "/gpt_oss_20b_primed/23/model.pickle": 23,
     },
     "gpt_oss_20b_harmony": {
         linear_probe_out_parent_dir + "/gpt_oss_20b_harmony/0/model.pickle": 0,

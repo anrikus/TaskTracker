@@ -16,8 +16,8 @@ from tasktracker.utils.model import load_model
 # Update paths in task_tracker.config.models of cache_dir (HF cache dir),
 # activation_parent_dir (the output of activations), and text_dataset_parent_dir (dir of dataset text files)
 
-model_name: str = "gpt_oss_20b_harmony"
-with_priming: bool = False
+model_name: str = "gpt_oss_20b_harmony_primed"
+with_priming: bool = True
 
 
 def main():
