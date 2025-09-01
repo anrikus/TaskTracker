@@ -1,0 +1,7 @@
+- cd TaskTracker
+- uv sync
+- uv pip install -e .
+- source .venv/bin/activate
+- Run tasktracker/dataset_creation/recreate_*.ipynb (all 5)
+- Modify python tasktracker/activations/generate.py for model name and priming / no priming
+- Run `python tasktracker/activations/generate.py`
