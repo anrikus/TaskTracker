@@ -56,10 +56,15 @@ CONSTANTS_ALL_MODELS = {
         "ACTIVATIONS_DIR": activation_parent_dir + "/mistral_no_priming/training",
         "ACTIVATIONS_VAL_DIR": activation_parent_dir + "/mistral_no_priming/test",
     },
-    "gpt_oss_20b": {
+    "gpt_oss_20b_harmony": {
         "ACTIVATION_FILE_LIST_DIR": DATA_LISTS,
-        "ACTIVATIONS_DIR": activation_parent_dir + "gpt_oss_20b/training",
-        "ACTIVATIONS_VAL_DIR": activation_parent_dir + "gpt_oss_20b/validation",
+        "ACTIVATIONS_DIR": activation_parent_dir + "gpt_oss_20b_harmony/training",
+        "ACTIVATIONS_VAL_DIR": activation_parent_dir + "gpt_oss_20b_harmony/validation",
+    },
+    "gpt_oss_20b_harmony_primed": {
+        "ACTIVATION_FILE_LIST_DIR": DATA_LISTS,
+        "ACTIVATIONS_DIR": activation_parent_dir + "gpt_oss_20b_harmony_primed/training",
+        "ACTIVATIONS_VAL_DIR": activation_parent_dir + "gpt_oss_20b_harmony_primed/validation",
     },
 }
 
@@ -71,7 +76,8 @@ TEST_ACTIVATIONS_DIR_PER_MODEL = {
     "phi3": activation_parent_dir + "/phi3/test",
     "mistral_no_priming": activation_parent_dir + "/mistral_no_priming/test",
     "llama3_70b": activation_parent_dir + "/llama_3_70B_Instruct/test",
-    "gpt_oss_20b": activation_parent_dir + "gpt_oss_20b/test",
+    "gpt_oss_20b_harmony": activation_parent_dir + "gpt_oss_20b_harmony/test",
+    "gpt_oss_20b_harmony_primed": activation_parent_dir + "gpt_oss_20b_harmony_primed/test",
 }
 
 # Activations text files of test data (clean)
@@ -102,9 +108,13 @@ TEST_CLEAN_FILES_PER_MODEL = {
         file.strip()
         for file in open(os.path.join(DATA_LISTS, "test_clean_files_llama3_70b.txt"))
     ],
-    "gpt_oss_20b": [
+    "gpt_oss_20b_harmony": [
         file.strip()
-        for file in open(os.path.join(DATA_LISTS, "test_clean_files_gpt_oss_20b.txt"))
+        for file in open(os.path.join(DATA_LISTS, "test_clean_files_gpt_oss_20b_harmony.txt"))
+    ],
+    "gpt_oss_20b_harmony_primed": [
+        file.strip()
+        for file in open(os.path.join(DATA_LISTS, "test_clean_files_gpt_oss_20b_harmony_primed.txt"))
     ],
 }
 
@@ -136,10 +146,16 @@ TEST_POISONED_FILES_PER_MODEL = {
         file.strip()
         for file in open(os.path.join(DATA_LISTS, "test_poisoned_files_llama3_70b.txt"))
     ],
-    "gpt_oss_20b": [
+    "gpt_oss_20b_harmony": [
         file.strip()
         for file in open(
-            os.path.join(DATA_LISTS, "test_poisoned_files_gpt_oss_20b.txt")
+            os.path.join(DATA_LISTS, "test_poisoned_files_gpt_oss_20b_harmony.txt")
+        )
+    ],
+    "gpt_oss_20b_harmony_primed": [
+        file.strip()
+        for file in open(
+            os.path.join(DATA_LISTS, "test_poisoned_files_gpt_oss_20b_harmony_primed.txt")
         )
     ],
 }

@@ -7,7 +7,7 @@ import numpy as np
 from sklearn.linear_model import LogisticRegression
 from tqdm import tqdm
 
-MODEL = "gpt_oss_20b"
+MODEL = "gpt_oss_20b_harmony"
 OUTPUT_DIR = str(
     Path(__file__).parent.parent.parent.parent / "trained_linear_probes" / MODEL
 )
@@ -32,7 +32,8 @@ LAYERS_PER_MODEL = {
     "mistral": [0, 7, 15, 23, 31],
     "llama3_8b": [0, 7, 15, 23, 31],
     "mistral_no_priming": [0, 7, 15, 23, 31],
-    "gpt_oss_20b": [0, 7, 15, 23],
+    "gpt_oss_20b_harmony": [0, 7, 15, 23],
+    "gpt_oss_20b_harmony_primed": [0, 7, 15, 23],
 }
 
 
