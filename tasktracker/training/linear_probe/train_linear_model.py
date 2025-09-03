@@ -32,6 +32,8 @@ LAYERS_PER_MODEL = {
     "mistral": [0, 7, 15, 23, 31],
     "llama3_8b": [0, 7, 15, 23, 31],
     "mistral_no_priming": [0, 7, 15, 23, 31],
+    "gpt_oss_20b": [0, 7, 15, 23],
+    "gpt_oss_20b_primed": [0, 7, 15, 23],
     "gpt_oss_20b_harmony": [0, 7, 15, 23],
     "gpt_oss_20b_harmony_primed": [0, 7, 15, 23],
 }
