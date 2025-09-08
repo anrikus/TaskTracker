@@ -64,9 +64,5 @@
 	// Set up Python virtual environment using uv
 	"postCreateCommand": "pipx install --index-url https://pypi.org/simple/ uv && uv python install ${containerEnv:PYTHON_VERSION} && uv venv /workspaces/TaskTracker/.venv --clear --python ${PYTHON_VERSION} && cd /workspaces/TaskTracker && uv sync && uv pip install -e .",
 	// Set `remoteUser` to `root` to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
-	"remoteUser": "vscode",
-	"runArgs": [
-		"--gpus",
-		"all"
-	]
+	"remoteUser": "vscode"
 }
