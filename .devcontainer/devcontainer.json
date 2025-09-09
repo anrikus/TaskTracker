@@ -1,22 +1,7 @@
 {
 	"build": {
-		"dockerfile": "./Dockerfile",
-		"context": "."
-	},
-	"features": {
-		"ghcr.io/devcontainers/features/common-utils:2": {
-			"username": "vscode",
-			"userUid": "1000",
-			"userGid": "1000",
-			"upgradePackages": "true"
-		},
-		"ghcr.io/devcontainers/features/azure-cli:1": {},
-		"ghcr.io/devcontainers/features/git:1": {},
-		"ghcr.io/devcontainers/features/git-lfs:1": {},
-		"ghcr.io/devcontainers/features/github-cli:1": {},
-		"ghcr.io/devcontainers-extra/features/black:2": {},
-		"ghcr.io/devcontainers-extra/features/isort:2": {},
-		"ghcr.io/devcontainers-extra/features/pylint:2": {}
+		"context": ".",
+		"dockerfile": "./Dockerfile"
 	},
 	// Add environment variables
 	"containerEnv": {
@@ -59,6 +44,21 @@
 				"python.typeChecking": "basic"
 			}
 		}
+	},
+	"features": {
+		"ghcr.io/devcontainers-extra/features/black:2": {},
+		"ghcr.io/devcontainers-extra/features/isort:2": {},
+		"ghcr.io/devcontainers-extra/features/pylint:2": {},
+		"ghcr.io/devcontainers/features/azure-cli:1": {},
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"upgradePackages": "true",
+			"userGid": "1000",
+			"username": "vscode",
+			"userUid": "1000"
+		},
+		"ghcr.io/devcontainers/features/git-lfs:1": {},
+		"ghcr.io/devcontainers/features/git:1": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {}
 	},
 	// Download and install Azure Artifacts Credential Provider and uv
 	// Set up Python virtual environment using uv
