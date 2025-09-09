@@ -21,7 +21,7 @@ activation_parent_dir = str(
 # Directory where the dataset text files are stored
 text_dataset_parent_dir = str(
     os.path.join(
-        BASE_DIR, "dataset_creation/dataset_sampled"
+BASE_DIR, "tasktracker/dataset_creation/dataset_sampled"
     )
 )
 
