@@ -6,7 +6,7 @@ import torch
 
 from tasktracker.models.model import Model
 
-BASE_DIR = Path().cwd().parent
+BASE_DIR = Path().cwd().parent.parent
 
 # Set the cache directory for Hugging Face transformers
 cache_dir = str(os.path.join(BASE_DIR, "disk1/"))
