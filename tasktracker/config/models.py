@@ -27,15 +27,18 @@ BASE_DIR, "tasktracker/dataset_creation/dataset_sampled"
 
 # Paths to dataset files
 data = {
-    "train": os.path.join(text_dataset_parent_dir, "train_subset.json"),
-    "val_clean": os.path.join(text_dataset_parent_dir, "dataset_out_clean.json"),
-    "val_poisoned": os.path.join(
-        text_dataset_parent_dir, "dataset_out_poisoned_v1.json"
-    ),
-    "test_clean": os.path.join(text_dataset_parent_dir, "dataset_out_clean_v2.json"),
-    "test_poisoned": os.path.join(
-        text_dataset_parent_dir, "dataset_out_poisoned_v2.json"
-    ),
+    # Prefix with 'train', 'val', or 'test' to indicate the subset.
+    "train_clean_xpia": os.path.join(text_dataset_parent_dir, "xpia-data/xpia_clean.json"),
+    "train_poisoned_xpia": os.path.join(text_dataset_parent_dir, "xpia-data/xpia_poisoned.json"),
+    # "train": os.path.join(text_dataset_parent_dir, "xpia_clean.json"),
+    # "val_clean": os.path.join(text_dataset_parent_dir, "dataset_out_clean.json"),
+    # "val_poisoned": os.path.join(
+    #     text_dataset_parent_dir, "dataset_out_poisoned_v1.json"
+    # ),
+    # "test_clean": os.path.join(text_dataset_parent_dir, "dataset_out_clean_v2.json"),
+    # "test_poisoned": os.path.join(
+    #     text_dataset_parent_dir, "dataset_out_poisoned_v2.json"
+    # ),
 }
 
 # Initialize models with specific configurations
