@@ -4,10 +4,7 @@ import logging
 import torch
 
 from tasktracker.config.models import cache_dir, models
-from tasktracker.utils.activations import (
-    process_texts_in_batches,
-    process_texts_in_batches_pairs,
-)
+from tasktracker.utils.activations import process_texts_in_batches
 from tasktracker.utils.model import load_model
 
 # NOTE: Configuration
@@ -50,25 +47,14 @@ def main():
             subset = json.load(open(data, "r"))
 
             # Determine directory and subset types based on data type
-            if data_type == "train":
-                directory_name = "training"
-                process_texts_in_batches(
+            directory_name = data_type.split("_")[0]
+            process_texts_in_batches(
                     dataset_subset=subset[model.start_idx :],
                     model=model,
                     data_type=data_type,
                     sub_dir_name=directory_name,
                     with_priming=with_priming,
-                )
-            else:
-                directory_name = "validation" if "val" in data_type else "test"
-                subset_type = "clean" if "clean" in data_type else "poisoned"
-                process_texts_in_batches_pairs(
-                    dataset_subset=subset[model.start_idx :],
-                    model=model,
-                    data_type=subset_type,
-                    sub_dir_name=directory_name,
-                    with_priming=with_priming,
-                )
+            )
 
         except json.JSONDecodeError as json_err:
             logging.error(f"Error decoding JSON for {data_type}: {json_err}")
