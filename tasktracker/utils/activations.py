@@ -169,7 +169,7 @@ def process_texts_in_batches_pairs(
 
     for i in tqdm(range(0, len(dataset_subset), batch_size)):
 
-        batch_primary, batch_primary_clean, batch_primary_poisoned = (
+        batch_primary, batch_primary_text = (
             format_prompts(dataset_subset[i : i + batch_size], with_priming)
             if "harmony" not in model.name
             else format_harmony_prompts(
@@ -180,20 +180,12 @@ def process_texts_in_batches_pairs(
         hidden_batch_primary = torch.stack(
             [get_last_token_activations_single(text, model) for text in batch_primary]
         )
-        if data_type == "clean":
-            hidden_batch_primary_with_text = torch.stack(
-                [
-                    get_last_token_activations_single(text, model)
-                    for text in batch_primary_clean
-                ]
-            )
-        elif data_type == "poisoned":
-            hidden_batch_primary_with_text = torch.stack(
-                [
-                    get_last_token_activations_single(text, model)
-                    for text in batch_primary_poisoned
-                ]
-            )
+        hidden_batch_primary_with_text = torch.stack(
+            [
+                get_last_token_activations_single(text, model)
+                for text in batch_primary_text
+            ]
+        )
 
         hidden_batch = torch.stack(
             [hidden_batch_primary, hidden_batch_primary_with_text]
