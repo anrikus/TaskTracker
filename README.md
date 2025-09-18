@@ -227,9 +227,13 @@ model_name: str = "mistral"  # Choose from models in task_tracker.config.models
 with_priming: bool = True    # Set to False if no priming prompt is needed
 ```
 
-3. (Optional) Modify the priming prompt in `task_tracker/utils/data.py` if needed.
+3. (Optional) If using the `train_subset.json` dataset, run the script
+ `tasktracker/dataset_creation/convert_original_to_new_format.py`
+ to convert the data to the new format. For example: `python convert_original_to_new_format.py dataset_sampled/train_subset.json dataset_sampled/train_original`; this produces two files, one with clean and one with poisoned examples. In this case, update `task_tracker/config/models.py` appropriately.
 
-4. Generate activations:
+4. (Optional) Modify the priming prompt in `task_tracker/utils/data.py` if needed.
+
+5. Generate activations:
 ```bash
 uv run python task_tracker/activations/generate.py
 ```
