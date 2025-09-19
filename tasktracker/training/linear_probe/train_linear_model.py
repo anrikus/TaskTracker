@@ -1,28 +1,22 @@
-import json
+"""Trains a logistic regression probe on the given activations data.
+"""
 import os
+import json
 import pickle
-from pathlib import Path
-
+import torch
 import numpy as np
-from sklearn.linear_model import LogisticRegression
 from tqdm import tqdm
+from pathlib import Path
+from sklearn.linear_model import LogisticRegression
 
-MODEL = "gpt_oss_20b_harmony"
+
+# MODEL = "gpt_oss_20b_harmony"
+MODEL = "phi3"
+ACTIVATIONS_DIR = Path(__file__).parent.parent.parent.parent / f"disk3/activations/{MODEL}/train"
 OUTPUT_DIR = str(
     Path(__file__).parent.parent.parent.parent / "trained_linear_probes" / MODEL
 )
 os.makedirs(OUTPUT_DIR, exist_ok=True)
-
-
-from tasktracker.training.dataset import (
-    ActivationsDatasetDynamic,
-    ActivationsDatasetDynamicPrimaryText,
-)
-from tasktracker.training.helpers.data import load_file_paths
-from tasktracker.training.utils.constants import (
-    CONSTANTS_ALL_MODELS,
-    OOD_POISONED_FILE,
-)
 
 # Which layers would be used for training probes
 LAYERS_PER_MODEL = {
@@ -37,77 +31,80 @@ LAYERS_PER_MODEL = {
     "gpt_oss_20b_harmony": [0, 7, 15, 23],
     "gpt_oss_20b_harmony_primed": [0, 7, 15, 23],
 }
+LAYERS = LAYERS_PER_MODEL[MODEL]
 
-
-ACTIVATION_FILE_LIST_DIR, ACTIVATIONS_DIR, ACTIVATIONS_VAL_DIR = (
-    CONSTANTS_ALL_MODELS[MODEL]["ACTIVATION_FILE_LIST_DIR"],
-    CONSTANTS_ALL_MODELS[MODEL]["ACTIVATIONS_DIR"],
-    CONSTANTS_ALL_MODELS[MODEL]["ACTIVATIONS_VAL_DIR"],
-)
 
 # Configuration settings
 config = {
-    "activations": ACTIVATIONS_DIR,
-    "activations_ood": ACTIVATIONS_VAL_DIR,
-    "ood_poisoned_file": OOD_POISONED_FILE,
+    "activations": str(ACTIVATIONS_DIR),
     "exp_name": "logistic_regression_" + MODEL,
 }
 
+def load_activation_deltas(files, num_layers):
+    """Loads the activations and computes the deltas in a single step.
+    This reduces the memory overhead.
+    """
+    deltas = []
+    for fname in tqdm(files):
+        curr_file = torch.load(os.path.join(ACTIVATIONS_DIR, fname))
 
-def train_model(train_files, num_layers):
-    print("Loading dataset.")
-    dataset = ActivationsDatasetDynamic(
-        train_files, root_dir=config["activations"], num_layers=num_layers
-    )
+        if isinstance(num_layers, int):
+            activation = curr_file[:, :, -num_layers :, :]
 
-    print("Processing dataset.")
-    clean_diff = []
-    poisoned_diff = []
-    for primary, clean, poisoned in tqdm(dataset):
-        clean_diff.append((clean - primary).flatten().float().numpy())
-        poisoned_diff.append((poisoned - primary).flatten().float().numpy())
-    y = [0] * len(dataset) + [1] * len(dataset)
-    X = clean_diff + poisoned_diff
+        elif isinstance(num_layers, tuple):
+            activation = curr_file[
+                :, :, num_layers[0] : num_layers[1] + 1, :
+            ]
+        activations_primary = activation[0, :, :, :]
+        activations_primary_with_text = activation[1, :, :, :]
+        # Shape is [batch, 1, dim]
+        delta = (activations_primary_with_text - activations_primary)
+        # Flatten, but keep batch dimension.
+        delta = delta.flatten(start_dim=1)
+        deltas.append(delta.float().numpy())
 
-    print("Training logistic regression classifier.")
+    # Stack the batches.
+    deltas = np.vstack(deltas)
+
+    return deltas
+
+def train_model(files_clean, files_poisoned, num_layers):
+    print(f"Loading activations and computing the deltas.")
+    clean_deltas = load_activation_deltas(files_clean, num_layers)
+    poisoned_deltas = load_activation_deltas(files_poisoned, num_layers)
+
+    print(f"Training the logistic regression model.")
+    X = np.vstack([clean_deltas, poisoned_deltas])
+    y = [0] * len(clean_deltas) + [1] * len(poisoned_deltas)
+
     model = LogisticRegression()
     model.fit(X, y)
 
-    return model
-
-
-def load_evaluation_data(val_files_clean, val_files_poisoned, num_layers):
-    print("Loading validation datasets.")
-    clean_dataset = ActivationsDatasetDynamicPrimaryText(
-        val_files_clean, num_layers=num_layers, root_dir=config.get("activations_ood")
-    )
-    poisoned_dataset = ActivationsDatasetDynamicPrimaryText(
-        val_files_poisoned,
-        num_layers=num_layers,
-        root_dir=config.get("activations_ood"),
-    )
-
-    print("Processing validation datasets.")
-    clean_diff = []
-    for primary, clean_with_text in tqdm(clean_dataset):
-        clean_diff.append((clean_with_text - primary).flatten().float().numpy())
-    poisoned_diff = []
-    for primary, poisoned_with_text in tqdm(poisoned_dataset):
-        poisoned_diff.append((poisoned_with_text - primary).flatten().float().numpy())
-    X_validation = np.array(clean_diff + poisoned_diff)
-    y_validation = [0] * len(clean_diff) + [1] * len(poisoned_diff)
-
-    return X_validation, y_validation
+    return model, X, y
 
 
 if __name__ == "__main__":
-    LAYERS = LAYERS_PER_MODEL[MODEL]
+    files_clean = []
+    files_poisoned = []
+    for fname in ACTIVATIONS_DIR.iterdir():
+        if "clean" in fname.name:
+            files_clean.append(str(fname))
+        elif "poisoned" in fname.name:
+            files_poisoned.append(str(fname))
+    print(f"Found {len(files_clean)} clean files and {len(files_poisoned)} poisoned files.")
+
+    # Option to subsample for quick testing.
+    N = -1
+    files_clean = files_clean[:N]
+    files_poisoned = files_poisoned[:N]
+    print(f"Using {len(files_clean)} clean files and {len(files_poisoned)} poisoned files.")
 
     for n_layer in LAYERS:
         print(f"[*] Training model for the {n_layer}-th activation layer.")
         os.makedirs(os.path.join(OUTPUT_DIR, str(n_layer)), exist_ok=True)
         layer_output_dir = os.path.join(OUTPUT_DIR, str(n_layer))
 
+        # Store config.
         _config = config.copy()
         _config["num_layers"] = n_layer
         _config["exp_name"] = f"{config['exp_name']}_{n_layer}"
@@ -115,34 +112,16 @@ if __name__ == "__main__":
         with open(os.path.join(layer_output_dir, "config.json"), "w") as f:
             json.dump(_config, f)
 
-        # Train the model.
-        train_files = load_file_paths(
-            os.path.join(ACTIVATION_FILE_LIST_DIR, "train_files_" + MODEL + ".txt")
-        )
-        val_files_clean = load_file_paths(
-            os.path.join(ACTIVATION_FILE_LIST_DIR, "val_clean_files_" + MODEL + ".txt")
-        )
-        val_files_poisoned = load_file_paths(
-            os.path.join(
-                ACTIVATION_FILE_LIST_DIR, "val_poisoned_files_" + MODEL + ".txt"
-            )
-        )
-
-        print(f"Training model with {len(train_files)} files.")
+        # Train model.
+        model, X, y = train_model(files_clean, files_poisoned, num_layers=(n_layer, n_layer))
+        out_fname = os.path.join(layer_output_dir, "model.pickle")
+        pickle.dump(model, open(out_fname, "wb"))
         print(
-            f"Evaluating model with {len(val_files_clean)} clean files and {len(val_files_poisoned)} poisoned files."
-        )
-
-        model = train_model(train_files, num_layers=(n_layer, n_layer))
-        pickle.dump(model, open(os.path.join(layer_output_dir, "model.pickle"), "wb"))
-        print(
-            f"""Model saved at {os.path.abspath(os.path.join(layer_output_dir, "model.pickle"))}"""
+            f"""Model saved at {os.path.abspath(out_fname)}"""
         )
 
         # Evaluate.
-        X_eval, y_eval = load_evaluation_data(
-            val_files_clean, val_files_poisoned, num_layers=(n_layer, n_layer)
-        )
-        accuracy = model.score(X_eval, y_eval)
+        print("Evaluating on training set.")
+        accuracy = model.score(X, y)
         print(accuracy)
         print("\n" * 4)
