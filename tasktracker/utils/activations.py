@@ -92,7 +92,7 @@ def process_texts_in_batches(
     model: Model,
     data_type: str,
     sub_dir_name: str,
-    batch_size=500,
+    batch_size=250,
     with_priming: bool = True,
 ):
     """
@@ -105,7 +105,7 @@ def process_texts_in_batches(
     if not os.path.exists(output_subdir):
         os.makedirs(output_subdir)
 
-    for i in tqdm(range(0, len(dataset_subset), batch_size, desc=f"Processing {data_type} in batches of {batch_size}"):
+    for i in tqdm(range(0, len(dataset_subset), batch_size), desc=f"Processing {data_type} in batches of {batch_size}"):
         batch_primary, batch_primary_text = (
             # FIXME: I don't think harmony is being used here.
             format_prompts(dataset_subset[i : i + batch_size], with_priming)
