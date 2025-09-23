@@ -56,7 +56,9 @@ def get_last_token_activations_single(
 
     with torch.no_grad():
         try:
-            inputs = inputs.cuda()
+            # Ensure we're on the right device (fixes lazy tensors initialization).
+            device = next(model.model.parameters()).device
+            inputs = inputs.to(device)
             outputs = model.model(inputs, output_hidden_states=True)
 
         except RuntimeError as e:
@@ -75,6 +77,11 @@ def get_last_token_activations_single(
         for i in range(start_layer, end_layer):
             # print(f'Extracting last token from layer {i}/{end_layer - 1}')
             last_tokens.append(outputs["hidden_states"][i][:, token].cpu())
+
+        # Clean up GPU memory
+        del outputs
+        torch.cuda.empty_cache()
+
         last_token_activations = torch.stack(last_tokens)
 
     return last_token_activations.squeeze(1)
@@ -85,7 +92,7 @@ def process_texts_in_batches(
     model: Model,
     data_type: str,
     sub_dir_name: str,
-    batch_size=1000,
+    batch_size=500,
     with_priming: bool = True,
 ):
     """
@@ -98,9 +105,9 @@ def process_texts_in_batches(
     if not os.path.exists(output_subdir):
         os.makedirs(output_subdir)
 
-    for i in tqdm(range(0, len(dataset_subset), batch_size)):
-
+    for i in tqdm(range(0, len(dataset_subset), batch_size, desc=f"Processing {data_type} in batches of {batch_size}"):
         batch_primary, batch_primary_text = (
+            # FIXME: I don't think harmony is being used here.
             format_prompts(dataset_subset[i : i + batch_size], with_priming)
             if "harmony" not in model.name
             else format_harmony_prompts(
@@ -108,19 +115,24 @@ def process_texts_in_batches(
             )
         )
 
-        hidden_batch_primary = torch.stack(
-            [get_last_token_activations_single(text, model) for text in batch_primary]
-        )
-        hidden_batch_primary_with_text = torch.stack(
-            [
-                get_last_token_activations_single(text, model)
-                for text in batch_primary_text
-            ]
-        )
+        # Primary (user prompt).
+        hidden_batch_primary_list = []
+        for text in tqdm(batch_primary):
+            hidden_batch_primary_list.append(get_last_token_activations_single(text, model))
+        hidden_batch_primary = torch.stack(hidden_batch_primary_list)
+        del hidden_batch_primary_list
+
+        # Primary + text document.
+        hidden_batch_primary_with_text_list = []
+        for text in tqdm(batch_primary_text):
+            hidden_batch_primary_with_text_list.append(get_last_token_activations_single(text, model))
+        hidden_batch_primary_with_text = torch.stack(hidden_batch_primary_with_text_list)
+        del hidden_batch_primary_with_text_list
 
         hidden_batch = torch.stack(
             [hidden_batch_primary, hidden_batch_primary_with_text]
         )
+
         # Construct file path for this batch
         time_str = datetime.now().strftime("%Y%m%d_%H%M%S")
         output_filepath = os.path.join(
@@ -136,3 +148,5 @@ def process_texts_in_batches(
         except Exception as e:
             logging.error(f"Failed to save file to {sanitized_output_filepath}: {e}")
             print(f"An error occurred while saving the file: {e}")
+
+        torch.cuda.empty_cache()
