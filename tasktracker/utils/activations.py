@@ -84,6 +84,9 @@ def get_last_token_activations_single(
 
         last_token_activations = torch.stack(last_tokens)
 
+    del last_tokens
+    torch.cuda.empty_cache()
+
     return last_token_activations.squeeze(1)
 
 
@@ -117,17 +120,25 @@ def process_texts_in_batches(
 
         # Primary (user prompt).
         hidden_batch_primary_list = []
-        for text in tqdm(batch_primary):
-            hidden_batch_primary_list.append(get_last_token_activations_single(text, model))
+        for text in batch_primary:
+            activations = get_last_token_activations_single(text, model)
+            hidden_batch_primary_list.append(activations)
+            del activations
+        torch.cuda.empty_cache()
         hidden_batch_primary = torch.stack(hidden_batch_primary_list)
         del hidden_batch_primary_list
+        torch.cuda.empty_cache()
 
         # Primary + text document.
         hidden_batch_primary_with_text_list = []
-        for text in tqdm(batch_primary_text):
-            hidden_batch_primary_with_text_list.append(get_last_token_activations_single(text, model))
+        for text in batch_primary_text:
+            activations = get_last_token_activations_single(text, model)
+            hidden_batch_primary_with_text_list.append(activations)
+            del activations
+        torch.cuda.empty_cache()
         hidden_batch_primary_with_text = torch.stack(hidden_batch_primary_with_text_list)
         del hidden_batch_primary_with_text_list
+        torch.cuda.empty_cache()
 
         hidden_batch = torch.stack(
             [hidden_batch_primary, hidden_batch_primary_with_text]
@@ -149,4 +160,8 @@ def process_texts_in_batches(
             logging.error(f"Failed to save file to {sanitized_output_filepath}: {e}")
             print(f"An error occurred while saving the file: {e}")
 
+        # Free up CUDA memory
+        del hidden_batch
+        del hidden_batch_primary
+        del hidden_batch_primary_with_text
         torch.cuda.empty_cache()
